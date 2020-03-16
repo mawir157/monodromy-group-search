@@ -2,16 +2,17 @@
 
 #include <algorithm>
 #include <armadillo>
-#include <complex>
-#include <vector>
-#include <iostream> 
-#include <set>
-#include <string>
-#include <cmath>
 #include <chrono>
+#include <cmath>
+#include <complex>
 #include <ctime>
 #include <fstream>
+#include <iostream>
 #include <random>
+#include <set>
+#include <string>
+#include <tuple>
+#include <vector>
 
 #include <math.h> 
 

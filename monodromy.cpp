@@ -1,5 +1,6 @@
 #include "includes.h"
 #include "utils.h"
+#include "parsedline.h"
 #include "rational.h"
 #include "matrixfns.h"
 #include "groupdescription.h"
@@ -12,158 +13,46 @@
 
 int main(int argc, char *argv[])
 {
-  //Construct a sphere
-  unsigned int v_id = 0;
-  std::vector<CWCell> empty;
-  CWCell p("p", v_id, empty, 0); ++v_id;
-  std::vector<CWCell> b {p};
-  CWCell sphere("s", v_id, b, 2);
-  sphere.Euler();
+  std::vector<ParsedLine> groups = parseFile("./groups.txt");
 
-  // construct a torus
-  // one vertex
-  v_id = 0;
-  CWCell X("X", v_id, empty, 0); ++v_id;
-  // EDGES
-  std::vector<CWCell> sv {X, X}; // end points of edge s
-  CWCell s("s", v_id, sv, 1); ++v_id;
-  std::vector<CWCell> tv {X, X}; // end points of edge t
-  CWCell t("t", v_id, tv, 1); ++v_id;
-  // Faces
-  std::vector<CWCell> vT {s, t, s, t}; // boundary of 2-cell
-  CWCell T("T", v_id, vT, 2); ++v_id;
-  T.Euler();
-/*
-  const Triple ATriple(1,4, 1,2, 3,4);
-  const Triple BTriple(3,20, 1,5, 12,20);
-  const CompMat3 A = TripleToMatrix(ATriple);
-  const CompMat3 B = TripleToMatrix(BTriple);
-  const CompMat3 H = SextupleToH(ATriple, BTriple);
-  std::vector<CompMat3> mats {A, B};
-  std::vector<std::string> names {"A", "B"};
-
-  printShortWords(1024, mats, names, H);
-  bool para = false;
-  for (unsigned int i = 0; i < 12; ++i)
-    std::cout << i << ": " << ((CheckWords2(std::pow(4, i), mats, H, para))? "GOOD" : "BAD")
-              << std::endl;
-
-  jorgensen_wrapper(mats, H, std::pow(4, 5));
-
-  return 0;
-*/
-
-  std::string line;
-  std::ifstream data_file("./groups.txt");
-
-  while (getline(data_file, line))
+  for (size_t i = 0; i < groups.size(); ++i)
   {
-      //std::cout << std::endl << line << std::endl << std::endl;
-      if (line.substr(0, 1) == "#")
-      {
-        std::cout << line << std::endl;
-        continue;
-      }
+    auto [ A, B, H ] = groups[i].toMatrices();
 
-      if (line.substr(0, 1) == "!")
-      {
-        continue;
-      }
+    mat_sig sig = get_mat_sig(H);
+    std::vector<CompMat3> mats {A, B};
+    std::vector<std::string> names {"A", "B"};
+    bool para = false;
 
-      if (line == "")
-        continue;
+    std::cout << groups[i].print()
+              << (CheckWords2(std::pow(4, 9), mats, H, para) ? "" : " | NON-DISCRETE!");
+    std::cout << (para ? " | PARABOLIC" : "") << std::endl;
+    jorgensen_wrapper(mats, H, std::pow(4, 11), true);
+    std::cout << (jorgensen_all(mats, H, std::pow(4, 9)) ? "*PASSED" : "*FAILED") << std::endl;
 
-      int from = 0;
-      int comma = line.find(",", from);
-      const int a11 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int a12 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int a21 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int a22 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int a31 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int a32 = std::stoi(line.substr(from, comma - from));
-
-      from = comma + 1;;
-      comma = line.find(",", from);
-      const int b11 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int b12 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int b21 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int b22 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int b31 = std::stoi(line.substr(from, comma - from));
-      from = comma + 1;
-      comma = line.find(",", from);
-      const int b32 = std::stoi(line.substr(from, comma - from));
-
-      // expected reflection order
-      from = comma + 1;
-      comma = line.find(",", from);
-      const std::string ref_order = line.substr(from, comma - from);
-      int p = -1;
-      if (ref_order != "*")
-        p = std::stoi(ref_order);
-
-      Triple ATriple(a11,a12, a21,a22, a31,a32);
-      Triple BTriple(b11,b12, b21,b22, b31,b32);
-
-      const CompMat3 A = TripleToMatrix(ATriple);
-      const CompMat3 B = TripleToMatrix(BTriple);
-      const CompMat3 H = SextupleToH(ATriple, BTriple);
-      mat_sig sig = get_mat_sig(H);
-      std::vector<CompMat3> mats {A, B};
-      std::vector<std::string> names {"A", "B"};
-      bool para = false;
-
-      std::cout << "A = "<< ATriple.asString() 
-                << ", B = "<< BTriple.asString()
-                << " | " << sig.asString() 
-                << " | " << p
-                << (CheckWords2(std::pow(4, 9), mats, H, para) ? "" : " | NON-DISCRETE!");
-      std::cout << (para ? " | PARABOLIC" : "") << std::endl;
-      jorgensen_wrapper(mats, H, std::pow(4, 11), true);
-      std::cout << (jorgensen_all(mats, H, std::pow(4, 9)) ? "*PASSED" : "*FAILED") << std::endl;
-
-      GroupDescription gd;
-      gd.calc(mats, names, H, "BA`", "ABA`A`", "A`B");
+    GroupDescription gd;
+    gd.calc(mats, names, H, "BA`", "ABA`A`", "A`B");
+    std::cout << gd.print() << std::endl;
+    {
+      gd.even_better_find(mats, names, H, groups[i].get_ref_order(), 4096);
       std::cout << gd.print() << std::endl;
-//      if (!para)
-      {
-        gd.even_better_find(mats, names, H, p, 4096);
-        std::cout << gd.print() << std::endl;
-        // gd.better_find(mats, names, H, p, std::pow(4, 5));
-        // std::cout << gd.print() << std::endl;
-      }
+    }
 
-      // if ((sig.m_pos == 2) && (sig.m_neg == 1))
-      // {
-      //   std::cout << std::endl;
-      //   Point base = find_null(H);
-      //   FunDom fd(base, H);
-      //   for (unsigned int i = 0; i < std::pow(4, 9); ++i)
-      //   {
-      //     CompMat3 temp = WordToMatrix(i, mats);
-      //     fd.addPoint(temp);
-      //   }
-      //   fd.stochastic_lattice(1000, true);
-      // }
-      std::cout << std::endl << std::endl;
+    // if ((sig.m_pos == 2) && (sig.m_neg == 1))
+    // {
+    //   std::cout << std::endl;
+    //   Point base = find_null(H);
+    //   FunDom fd(base, H);
+    //   for (unsigned int i = 0; i < std::pow(4, 9); ++i)
+    //   {
+    //     CompMat3 temp = WordToMatrix(i, mats);
+    //     fd.addPoint(temp);
+    //   }
+    //   fd.stochastic_lattice(1000, true);
+    // }
+    std::cout << std::endl << std::endl;
   }
+
   return 0;
 
 ////////////////////////////////////////////////////////////////////////////////
