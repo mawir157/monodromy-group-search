@@ -16,6 +16,10 @@ class ParsedLine
 		std::tuple<CompMat3, CompMat3, CompMat3> toMatrices() const;
 		int get_ref_order() const { return ref_order; }
 	private:
+		std::string print_helper(const unsigned int num,
+														 const unsigned int den,
+														 const std::string str) const;
+
 		const unsigned int a11;
 		const unsigned int a12;
 		const unsigned int a21;

@@ -38,18 +38,6 @@ int main(int argc, char *argv[])
       std::cout << gd.print() << std::endl;
     }
 
-    // if ((sig.m_pos == 2) && (sig.m_neg == 1))
-    // {
-    //   std::cout << std::endl;
-    //   Point base = find_null(H);
-    //   FunDom fd(base, H);
-    //   for (unsigned int i = 0; i < std::pow(4, 9); ++i)
-    //   {
-    //     CompMat3 temp = WordToMatrix(i, mats);
-    //     fd.addPoint(temp);
-    //   }
-    //   fd.stochastic_lattice(1000, true);
-    // }
     std::cout << std::endl << std::endl;
   }
 

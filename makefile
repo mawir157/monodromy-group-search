@@ -1,7 +1,7 @@
 appname := chtge
 
 CXX := g++
-CXXFLAGS := -std=c++11 -O3
+CXXFLAGS := -std=c++17 -O3
 LDLIBS := -larmadillo
 
 srcfiles := $(shell find . -name "*.cpp")

@@ -25,7 +25,7 @@ class Triple
            int m3, unsigned int n3);
     Triple(Rational r1, Rational r2, Rational r3);
     void reset(int m1, unsigned int n1, int m2, unsigned int n2,
-                       int m3, unsigned int n3);
+               int m3, unsigned int n3);
     double score() const {return r1.value() + r2.value() + r3.value();}
     Triple conj() const;
     Triple rot_by_pi() const;

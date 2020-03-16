@@ -7,49 +7,35 @@ ParsedLine::ParsedLine(const unsigned int a11, const unsigned int a12,
 											 const unsigned int b21, const unsigned int b22,
 											 const unsigned int b31, const unsigned int b32,
 											 const int ref_order) :
-		a11(a11), a12(a12), a21(a21), a22(a22), a31(a31), a32(a32), 
-		b11(b11), b12(b12), b21(b21), b22(b22), b31(b31), b32(b32), 
+		a11(a11), a12(a12), a21(a21), a22(a22), a31(a31), a32(a32),
+		b11(b11), b12(b12), b21(b21), b22(b22), b31(b31), b32(b32),
 		ref_order(ref_order)
 {}
+
+std::string ParsedLine::print_helper(const unsigned int num,
+			                               const unsigned int den,
+			                    					 const std::string str) const
+{
+	std::string s;
+  s.append(std::to_string(num));
+  if (num != 0)
+  {
+	  s.append("/");
+	  s.append(std::to_string(den));
+	}
+	s.append(str);
+	return s;
+}
 
 std::string ParsedLine::print() const
 {
 	std::string s = "(";
-  s.append(std::to_string(a11));
-  if (a11 != 0)
-  {
-	  s.append("/");
-	  s.append(std::to_string(a12));
-	}
-	s.append(",");
-
-  s.append(std::to_string(a21));
-  s.append("/");
-  s.append(std::to_string(a22));
-  s.append(",");
-
-  s.append(std::to_string(a31));
-  s.append("/");
-  s.append(std::to_string(a32));
-  s.append(";");
- 
- 	s.append(std::to_string(b11));
-  if (b11 != 0)
-  {
-  	s.append("/");
-  	s.append(std::to_string(b12));
-  }
-  s.append(",");
-
-  s.append(std::to_string(b21));
-  s.append("/");
-  s.append(std::to_string(b22));
-  s.append(",");
-
-  s.append(std::to_string(b31));
-  s.append("/");
-  s.append(std::to_string(b32));
-  s.append(")");
+	s.append(print_helper(a11, a12, ","));
+	s.append(print_helper(a21, a22, ","));
+	s.append(print_helper(a31, a32, ";"));
+	s.append(print_helper(b11, b12, ","));
+	s.append(print_helper(b21, b22, ","));
+	s.append(print_helper(b31, b32, ")"));
 
   s.append("<");
   s.append(std::to_string(ref_order));
