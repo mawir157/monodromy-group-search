@@ -21,17 +21,21 @@ enum IsomClass { Identity,
                  Loxodromic,
                  Failure };
 
+enum Generator { ID, A, Ai, B, Bi, R1, R2, R3, E1, E2, E3 };
+Generator inverse(const Generator gen);
+
 CompMat3 TripleToMatrix(const Triple A, const bool norm=true);
 CompMat3 SextupleToH(const Triple A, const Triple B, const bool force = true);
 CompMat3 GetU(const Triple A);
 double goldman(const comp_d& t);
 bool isId(const CompMat3& matrix);
 bool areEqual(const CompMat3& A, const CompMat3& B);
+bool traceEqual(const comp_d& trace_a, const comp_d& trace_b);
 int Order(const CompMat3& m, const CompMat3& H,
           const int max_order = MAX_ORDER);
 CompMat3 conj(const CompMat3 A, const CompMat3 P);
 std::string GetIsomClassStr(const CompMat3& m, const CompMat3& H);
-IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H, const bool debug = false);
+IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H);
 bool isPower(const CompMat3& A, const CompMat3& B,
              const unsigned int upto = 20);
 int Braid(const CompMat3& A, const CompMat3& B,
