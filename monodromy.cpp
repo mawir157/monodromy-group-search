@@ -8,6 +8,8 @@
 #include "geometry.h"
 #include "polytope.h"
 #include "jorgensen.h"
+#include "getwordsupton.h"
+#include "word.h"
 
 #include <stdlib.h>
 
@@ -21,6 +23,23 @@ int main(int argc, char *argv[])
 
     mat_sig sig = get_mat_sig(H);
     std::vector<CompMat3> mats {A, B};
+
+    std::vector<Generator> v_a {Generator::A};
+    Word word_A(v_a, A, H, GetIsomClass(A,H), arma::trace(A), Order(A,H));
+    Word word_Ai = word_A.invert();
+
+    std::vector<Generator> v_b {Generator::B};
+    Word word_B(v_b, B, H, GetIsomClass(B,H), arma::trace(B), Order(B,H));
+    Word word_Bi = word_B.invert();
+
+    std::vector<Word> gen_words {word_A, word_Ai, word_B, word_Bi};
+
+    std::vector<Word> new_Words = get_words_upto_n(12, gen_words, H);
+    std::cout << new_Words.size() << std::endl;
+
+
+
+
     std::vector<std::string> names {"A", "B"};
     bool para = false;
 
