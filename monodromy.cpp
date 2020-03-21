@@ -15,7 +15,38 @@
 
 int main(int argc, char *argv[])
 {
-  std::vector<ParsedLine> groups = parseFile("./input/groups.txt");
+  int mode = 0;
+  std::string filepath = "NULL";
+  unsigned int denom = 0;
+
+  if (argc != 3)
+  {
+    std::cout << "invalid options" << std::endl;
+    return -1;
+  }
+  else
+  {
+    if (std::strcmp(argv[1], "-f") == 0)
+    {
+      std::cout << "f" << std::endl;
+      mode = 0; // read groups from file;
+      filepath = argv[2];
+    }
+    else if (std::strcmp(argv[1], "-l") == 0)
+    {
+      std::cout << "l" << std::endl;
+      mode = 1;
+      denom = std::stoi(argv[2]);
+      return -1;// not implemented yet
+    }
+    else
+    {
+      std::cout << "unrecognised options" << std::endl;
+      return -1;
+    }
+  }
+
+  std::vector<ParsedLine> groups = parseFile(filepath);
 
   bool para = false;
   for (size_t i = 0; i < groups.size(); ++i)
