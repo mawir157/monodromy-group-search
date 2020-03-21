@@ -45,6 +45,7 @@ class Word
     CompMat3 get_H_matrix() const { return m_H_matrix; }
     comp_d get_trace() const { return m_trace; }
     std::vector<Generator> get_gen_vec() const { return m_gen_vec; }
+    bool is_non_finite_elliptic() const;
 
     // overload operators here
     Word operator*(const Word& wd) const;

@@ -59,3 +59,112 @@ std::vector<Word> get_words_upto_n(const unsigned int n,
 
   return seen_words;
 }
+
+bool CheckWords(const std::vector<Word>& Words,
+                bool& SeenParabolic)
+{
+  SeenParabolic = false;
+  for (size_t i = 0; i< Words.size(); ++i)
+  {
+    Word word_test = Words[i];
+
+    if (word_test.is_non_finite_elliptic())
+      return false;
+
+    if (!SeenParabolic)
+      if ((word_test.get_isom_class() == IsomClass::ParabolicPure) ||
+          (word_test.get_isom_class() == IsomClass::ParabolicScrew))
+        SeenParabolic = true;
+  }
+  return true;
+}
+
+double summary(const std::vector<Word>& Words)
+{
+  unsigned int ID_count = 0;
+  unsigned int EL_count = 0; std::map<int, int> EL_ords;
+  unsigned int RP_count = 0; std::map<int, int> RP_ords;
+  unsigned int RL_count = 0; std::map<int, int> RL_ords;
+  unsigned int PP_count = 0;
+  unsigned int PS_count = 0;
+  unsigned int LX_count = 0;
+
+  for (size_t i = 0; i < Words.size(); ++i)
+  {
+    const Word w = Words[i];
+    switch (w.get_isom_class())
+    {
+      case IsomClass::Identity:
+      {
+        ++ID_count;
+        break;
+      }
+      case IsomClass::Elliptic:
+      {
+        ++EL_count;
+        ++EL_ords[w.get_order()];
+        break;
+      }
+      case IsomClass::ReflectionPoint:
+      {
+        ++RP_count;
+        ++RP_ords[w.get_order()];
+        break;
+      }
+      case IsomClass::ReflectionLine:
+      {
+        ++RL_count;
+        ++RL_ords[w.get_order()];
+        break;
+      }
+      case IsomClass::ParabolicPure:
+      {
+        ++PP_count;
+        break;
+      }
+      case IsomClass::ParabolicScrew:
+      {
+        ++PS_count;
+        break;
+      }
+      case IsomClass::Loxodromic:
+      {
+        ++LX_count;
+        break;
+      }
+    }
+  }
+  //
+
+  std::map<int, int>::iterator it;
+
+  std::cout << "Total words:         " << Words.size() << std::endl;
+  std::cout << "Identity:            " << ID_count << std::endl;
+  std::cout << "Elliptic:            " << EL_count << std::endl;
+  for ( it = EL_ords.begin(); it != EL_ords.end(); ++it )
+  {
+    std::cout << "\t" << it->first << ": "
+              << it->second  << std::endl ;
+  }
+  std::cout << "Reflection in Point: " << RP_count << std::endl;
+  for ( it = RP_ords.begin(); it != RP_ords.end(); ++it )
+  {
+    std::cout << "\t" << it->first << ": "
+              << it->second  << std::endl ;
+  }
+  std::cout << "Reflection in Line:  " << RL_count << std::endl;
+  for ( it = RL_ords.begin(); it != RL_ords.end(); ++it )
+  {
+    std::cout << "\t" << it->first << ": "
+              << it->second  << std::endl ;
+  }
+  std::cout << "Pure Parabolic:      " << PP_count << std::endl;
+  std::cout << "Screw Parabolic:     " << PS_count << std::endl;
+  std::cout << "Loxodromic:          " << LX_count << std::endl;
+
+  std::cout << "Non-Loxodromic ratio:"
+            << 1 - ((1.0 * LX_count) / (1.0 * Words.size()))
+            << std::endl;
+
+  return (1.0 * LX_count) / (1.0 * Words.size());
+}

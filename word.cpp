@@ -163,14 +163,18 @@ void Word::simplify_gen_vec()
   return;
 }
 
+bool Word::is_non_finite_elliptic() const
+{
+  if ((m_iso_class == IsomClass::Elliptic) ||
+      (m_iso_class == IsomClass::ReflectionPoint) ||
+      (m_iso_class == IsomClass::ReflectionLine))
+    return (m_order < 0);
+
+  return false;
+}
+
 void Word::conjugate(const Word& P)
 {
-
-//    CompMat3               m_matrix;
-//    std::vector<Generator> m_gen_vec;
-//    IsomClass              m_iso_class;
-//    comp_d                 m_trace;
-//    int                    m_order;
   // create the new isometry matrix
   m_matrix = P.get_matrix() * m_matrix * arma::inv(P.get_matrix());
   // the isoclass, trace and order do not change
