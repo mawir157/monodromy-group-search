@@ -28,4 +28,4 @@ sudo make install
 
 ## Usage
 
-'mono'
+`mono`
