@@ -2,10 +2,10 @@
 
 Word::Word(std::vector<Generator> gen_vec,
            CompMat3 matrix,
-           CompMat3 H_matrix,
+           std::shared_ptr<const CompMat3> H_matrix,
            IsomClass iso_class,
            comp_d trace,
-           int order) : 
+           int order) :
     m_gen_vec(gen_vec)
   , m_matrix(matrix)
   , m_H_matrix(H_matrix)
@@ -13,7 +13,7 @@ Word::Word(std::vector<Generator> gen_vec,
   , m_trace(trace)
   , m_order(order) {}
 
-Word::Word(CompMat3 H_matrix) :
+Word::Word(std::shared_ptr<const CompMat3> H_matrix) :
     m_gen_vec(0)
   , m_matrix(arma::eye<CompMat3>(3,3))
   , m_H_matrix(H_matrix)
@@ -23,7 +23,7 @@ Word::Word(CompMat3 H_matrix) :
 
 std::string Word::as_string() const
 {
-  if (m_gen_vec.size() == 0) 
+  if (m_gen_vec.size() == 0)
     return "Id";
 
   std::string word_str;
@@ -93,7 +93,7 @@ std::string Word::str_isom_class() const
       case IsomClass::ParabolicScrew:  return "Parabolic Screw";
       case IsomClass::Loxodromic: return "Loxodromic";
                          default: return "UNCLASSIFIED";
-    }  
+    }
 }
 
 Generator Word::last_element() const
@@ -123,7 +123,7 @@ Word Word::invert() const
 
   std::vector<Generator> new_vector;
   new_vector.reserve(m_gen_vec.size());
-  
+
   for (size_t i = 0; i < m_gen_vec.size(); ++i)
   {
     Generator gen_to_add = inverse(m_gen_vec[m_gen_vec.size() - 1 - i]);
@@ -149,16 +149,16 @@ void Word::simplify_gen_vec()
   bool changed = true;
   while (changed)
   {
-    changed = false;    
-    for (size_t i = 0; i < m_gen_vec.size()-1; ++i) 
+    changed = false;
+    for (size_t i = 0; i < m_gen_vec.size()-1; ++i)
     {
       if (m_gen_vec[i] == inverse(m_gen_vec[i+1]))
       {
         m_gen_vec.erase(m_gen_vec.begin() + i, m_gen_vec.begin() + i + 2);
         changed = true && (m_gen_vec.size() > 1);
         break;
-      }    
-    } 
+      }
+    }
   }
   return;
 }
@@ -201,17 +201,17 @@ void Word::conjugate(const Word& P)
 
 Word power(const Word& base_word, const unsigned int p)
 {
-  Word new_word = Word(base_word.get_H_matrix());
+  Word new_word = Word(base_word.p_H_matrix());
   for (unsigned int i=0; i < p; ++i)
-    new_word = new_word * base_word;    
+    new_word = new_word * base_word;
 
   return new_word;
 }
 
 Word conjugate(const Word& base_word, const Word& conj_word)
 {
-  CompMat3 new_mat = conj_word.get_matrix() * 
-                     base_word.get_matrix() * 
+  CompMat3 new_mat = conj_word.get_matrix() *
+                     base_word.get_matrix() *
                      arma::inv(conj_word.get_matrix());
   // the isoclass, trace and order do not change
   IsomClass i_class = base_word.get_isom_class();
@@ -236,7 +236,7 @@ Word conjugate(const Word& base_word, const Word& conj_word)
     new_vec.push_back(gen_to_add);
   }
 
-  Word new_word(new_vec, new_mat, base_word.get_H_matrix(),
+  Word new_word(new_vec, new_mat, base_word.p_H_matrix(),
                 i_class, trace, order);
   new_word.simplify_gen_vec();
   return new_word;
@@ -246,7 +246,7 @@ Word Word::operator*(const Word& wd) const
 {
   CompMat3 new_mat = m_matrix * wd.get_matrix();
 
-  IsomClass i_class = GetIsomClass(new_mat, m_H_matrix);
+  IsomClass i_class = GetIsomClass(new_mat, this->get_H_matrix());
 
   unsigned int order = 0;
   if (i_class == IsomClass::Loxodromic ||
@@ -256,7 +256,7 @@ Word Word::operator*(const Word& wd) const
   else if (i_class == IsomClass::Identity)
     order = 1;
   else
-    order = Order(new_mat, m_H_matrix);
+    order = Order(new_mat, this->get_H_matrix());
 
   comp_d trace = arma::trace(new_mat);
 
@@ -283,7 +283,7 @@ bool Word::operator<(const Word& wd) const
 
   if (m_gen_vec.size() > wd.word_length())
     return false;
-  
+
   std::vector<Generator> comp_vec = wd.get_gen_vec();
   // at this point the two words are the same length
   for (size_t i = 0; i < m_gen_vec.size(); ++i)
@@ -304,7 +304,7 @@ bool Word::operator>(const Word& wd) const
 
   if (m_gen_vec.size() < wd.word_length())
     return false;
-  
+
   std::vector<Generator> comp_vec = wd.get_gen_vec();
   // at this point the two words are the same length
   for (size_t i = 0; i < m_gen_vec.size(); ++i)

@@ -21,21 +21,22 @@ int main(int argc, char *argv[])
   for (size_t i = 0; i < groups.size(); ++i)
   {
     auto [ A, B, H ] = groups[i].toMatrices();
+    std::shared_ptr<const CompMat3> p_H = std::make_shared<const CompMat3>(H);
 
     mat_sig sig = get_mat_sig(H);
     std::vector<CompMat3> mats {A, B};
 
     std::vector<Generator> v_a {Generator::A};
-    Word word_A(v_a, A, H, GetIsomClass(A,H), arma::trace(A), Order(A,H));
+    Word word_A(v_a, A, p_H, GetIsomClass(A,H), arma::trace(A), Order(A,H));
     Word word_Ai = word_A.invert();
 
     std::vector<Generator> v_b {Generator::B};
-    Word word_B(v_b, B, H, GetIsomClass(B,H), arma::trace(B), Order(B,H));
+    Word word_B(v_b, B, p_H, GetIsomClass(B,H), arma::trace(B), Order(B,H));
     Word word_Bi = word_B.invert();
 
     std::vector<Word> gen_words {word_A, word_Ai, word_B, word_Bi};
 
-    std::vector<Word> new_Words = get_words_upto_n(11, gen_words, H);
+    std::vector<Word> new_Words = get_words_upto_n(11, gen_words, p_H);
     std::cout << new_Words.size() << std::endl;
 
     std::cout << (CheckWords(new_Words, para) ? "" : " / NON-DISCRETE!");
