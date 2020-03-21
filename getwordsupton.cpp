@@ -162,7 +162,7 @@ double summary(const std::vector<Word>& Words)
   std::cout << "Screw Parabolic:     " << PS_count << std::endl;
   std::cout << "Loxodromic:          " << LX_count << std::endl;
 
-  std::cout << "Non-Loxodromic ratio:"
+  std::cout << "NonLoxodromic ratio: "
             << 1 - ((1.0 * LX_count) / (1.0 * Words.size()))
             << std::endl;
 

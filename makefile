@@ -1,4 +1,4 @@
-appname := chtge
+appname := mono
 
 CXX := g++
 CXXFLAGS := -std=c++17 -O3

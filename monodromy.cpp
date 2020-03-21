@@ -15,7 +15,7 @@
 
 int main(int argc, char *argv[])
 {
-  std::vector<ParsedLine> groups = parseFile("./groups.txt");
+  std::vector<ParsedLine> groups = parseFile("./input/groups.txt");
 
   bool para = false;
   for (size_t i = 0; i < groups.size(); ++i)
@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
     std::vector<Word> gen_words {word_A, word_Ai, word_B, word_Bi};
 
     std::vector<Word> new_Words = get_words_upto_n(11, gen_words, p_H);
+
+    std::cout << groups[i].print() << std::endl;
     std::cout << new_Words.size() << std::endl;
 
     std::cout << (CheckWords(new_Words, para) ? "" : " / NON-DISCRETE!");
