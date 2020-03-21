@@ -85,14 +85,14 @@ std::string Word::str_isom_class() const
 {
     switch (m_iso_class)
     {
-      case IsomClass::Identity:   return "Identity";
-      case IsomClass::Elliptic:   return "Elliptic";
+      case IsomClass::Identity:        return "Identity";
+      case IsomClass::Elliptic:        return "Elliptic";
       case IsomClass::ReflectionPoint: return "Reflection Point";
-      case IsomClass::ReflectionLine: return "Reflection Line";
-      case IsomClass::ParabolicPure:  return "Parabolic Pure";
+      case IsomClass::ReflectionLine:  return "Reflection Line";
+      case IsomClass::ParabolicPure:   return "Parabolic Pure";
       case IsomClass::ParabolicScrew:  return "Parabolic Screw";
-      case IsomClass::Loxodromic: return "Loxodromic";
-                         default: return "UNCLASSIFIED";
+      case IsomClass::Loxodromic:      return "Loxodromic";
+                         default:      return "UNCLASSIFIED";
     }
 }
 
@@ -318,3 +318,19 @@ bool Word::operator>(const Word& wd) const
   return false;
 }
 
+void FindIsometryThatFixes(const Point& p,
+                           const std::vector<Word>& words)
+{
+  const CompMat3& H = words[0].get_H_matrix();
+  for (size_t i = 0; i < words.size(); ++i)
+  {
+    CompMat3 temp = words[i].get_matrix();
+    const Point Mp = temp * p;
+
+    if (arma::approx_equal(normalize(Mp), normalize(p), "absdiff", TOL))
+    {
+      std::cout << words[i].as_string() << ": "
+                << words[i].str_isom_class() << std::endl;
+    }
+  }
+}

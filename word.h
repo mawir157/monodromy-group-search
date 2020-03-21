@@ -64,3 +64,6 @@ class Word
 
 Word conjugate(const Word& base_word, const Word& conj_word);
 Word power(const Word& base_word, const unsigned int p);
+
+void FindIsometryThatFixes(const Point& p,
+                           const std::vector<Word>& words);

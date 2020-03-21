@@ -614,22 +614,3 @@ void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
 
   return;
 }
-
-void FindIsometryThatFixes(const Point& p,
-                           const unsigned int upto,
-                           const std::vector<CompMat3>& Mats,
-                           const std::vector<std::string>& Names,
-                           const CompMat3& H)
-{
-  // for (unsigned int i = 0; i < upto; ++i)
-  // {
-  //   if (!IsWordMinimal(i, Mats.size()))
-  //     continue;
-  //   CompMat3 temp = WordToMatrix(i, Mats);
-  //   const Point Mp = temp * p;
-
-  //   if (arma::approx_equal(normalize(Mp), normalize(p), "absdiff", TOL))
-  //     std::cout << HumanWord(i, Names) << ": "
-  //               << GetIsomClassStr(temp, H) << std::endl;
-  // }
-}

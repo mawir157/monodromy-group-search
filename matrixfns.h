@@ -1,6 +1,7 @@
 #pragma once
 #include "includes.h"
 #include "rational.h"
+#include "geometry.h"
 
 struct mat_sig
 {
@@ -52,8 +53,3 @@ Point getEllipticFixedPoint(const CompMat3& M, const CompMat3& H);
 Point getLineReflectionPolar(const CompMat3& M, const CompMat3& H);
 void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
                         Point& p1, Point& p2);
-void FindIsometryThatFixes(const Point& p,
-                           const unsigned int upto,
-                           const std::vector<CompMat3>& Mats,
-                           const std::vector<std::string>& Names,
-                           const CompMat3& H);
