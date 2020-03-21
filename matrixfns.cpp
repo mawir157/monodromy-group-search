@@ -123,7 +123,7 @@ bool traceEqual(const comp_d& trace_a, const comp_d& trace_b)
   if (std::abs(trace_a - omega * omega * trace_b) < TOL)
     return true;
 
-  return false;  
+  return false;
 }
 
 bool areEqual(const CompMat3& A, const CompMat3& B)
@@ -137,7 +137,7 @@ bool areEqual(const CompMat3& A, const CompMat3& B)
   if (arma::approx_equal(A, omega * omega * B, "absdiff", TOL))
     return true;
 
-  return false;  
+  return false;
 }
 
 int Order(const CompMat3& m, const CompMat3& H, const int max_order)
@@ -206,7 +206,7 @@ std::string GetIsomClassStr(const CompMat3& m, const CompMat3& H)
       break;
     case IsomClass::ParabolicScrew:
       return "Screw Parabolic";
-      break; 
+      break;
     case IsomClass::Loxodromic:
       return "Loxodromic";
       break;
@@ -280,7 +280,7 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H)
       std::cout << "cross = " << std::endl << eigvec.t() * H * eigvec << std::endl;
 
       return IsomClass::Failure;
-    }      
+    }
 
     CompMat3 mHm = eigvec.t() * H * eigvec;
 
@@ -438,17 +438,6 @@ mat_sig get_mat_sig(const CompMat3& matrix, const double tol)
   return ret;
 }
 
-bool is_non_finite_elliptic(const CompMat3& m, const CompMat3& H)
-{
-  const IsomClass cl = GetIsomClass(m, H);
-  if ((cl== IsomClass::Elliptic) ||
-      (cl == IsomClass::ReflectionPoint) ||
-      (cl == IsomClass::ReflectionLine))
-    return (Order(m, H) < 0);
-
-  return false;
-}
-
 comp_d herm(const Point& p1, const Point& p2, const CompMat3& H)
 {
   CompMat3 t = p2.t() * H * p1;
@@ -457,7 +446,7 @@ comp_d herm(const Point& p1, const Point& p2, const CompMat3& H)
 comp_d crossprod(const Point& z1, const Point& z2,
                  const Point& w1, const Point& w2, const CompMat3& H)
 {
-  return (herm(w1, z1, H) * herm(w2, z2, H)) / 
+  return (herm(w1, z1, H) * herm(w2, z2, H)) /
          (herm(w2, z1, H) * herm(w1, z2, H));
 }
 
@@ -469,7 +458,7 @@ double Ma(const CompMat3& A)
 double comp_distance(const Point& p1, const Point& p2, const CompMat3& H)
 {
   // this should have imaginary part 0
-  // const comp_d t = (herm(p1, p2, H) * herm(p2, p1, H)) / 
+  // const comp_d t = (herm(p1, p2, H) * herm(p2, p1, H)) /
   //                  (herm(p1, p1, H) * herm(p2, p2, H));
   const comp_d t = crossprod(p1, p2, p2, p1, H);
 
@@ -479,7 +468,7 @@ double comp_distance(const Point& p1, const Point& p2, const CompMat3& H)
 Point find_null(const CompMat3& H)
 {
   double lower_bound = -100;
-  double upper_bound = 100; 
+  double upper_bound = 100;
   std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -497,97 +486,6 @@ Point find_null(const CompMat3& H)
   return base;
 }
 
-bool IsWordMinimal(const unsigned int word,
-                   const size_t n)
-{
-  // the identity is minimal!
-  if (word == 0)
-    return true;
-
-  int w = word - 1;
-  int prev = -1000; // big number
-  size_t len = 2 * n;
-  while(true)
-  {
-    const int e = w % len;
-    if ((e % 2) == 0)
-      if ((e + 1) == prev)
-        return false;
-    else
-      if (e == (prev + 1))
-        return false;
-
-    prev = e;
-
-    w /= len;
-    if (w == 0)
-      break;
-    w -= 1;
-  }
-  return true;   
-}
-
-bool CheckWords2(const unsigned int upto,
-                 const std::vector<CompMat3>& Mats,
-                 const CompMat3& H,
-                 bool& SeenParabolic)
-{
-  for (int word = 0; word < upto; ++word)
-  {
-    if (!IsWordMinimal(word, Mats.size()))
-      continue;
-
-    CompMat3 test = WordToMatrix(word, Mats);
-    if (is_non_finite_elliptic(test, H))
-    {
-      // std::cout << std::endl;
-      
-      // arma::cx_vec eigval;
-      // arma::cx_mat eigvec;
-
-      // arma::eig_gen(eigval, eigvec, test);
-
-      // std::cout << "evals = \n" << eigval <<std::endl;
-      // std::cout << "cross = \n" << eigvec.t() * H * eigvec << std::endl;
-      // std::cout << GetIsomClassStr(test, H) << std::endl;
-      // std::cout << Order(test, H) << std::endl;
-      return false;
-    }
-
-    const IsomClass iclass = GetIsomClass(test, H);
-
-    if ((iclass == IsomClass::ParabolicPure) ||
-        (iclass == IsomClass::ParabolicScrew))
-    {
-      SeenParabolic = true;
-      continue;
-    }
-  }
-  return true;  
-}
-
-void printShortWords(const unsigned int upto,
-                     const std::vector<CompMat3>& Mats,
-                     const std::vector<std::string>& Names,
-                     const CompMat3& H,
-                     const bool skip_loxo)
-{
-  unsigned int k = 1;
-  for (unsigned int i = 0; i < upto; ++i)
-  {
-    if (!IsWordMinimal(i, Mats.size()))
-      continue;
-
-    CompMat3 temp = WordToMatrix(i, Mats);
-    if ((GetIsomClass(temp, H) == IsomClass::Loxodromic) && skip_loxo)
-      continue;
-
-    std::cout << HumanWord(i, Names) << ": "
-              << GetIsomClassStr(temp, H) << std::endl;
-    ++k;
-  }
-}
-
 Point getEllipticFixedPoint(const CompMat3& M, const CompMat3& H)
 {
   arma::cx_vec eigval;
@@ -601,7 +499,7 @@ Point getEllipticFixedPoint(const CompMat3& M, const CompMat3& H)
   const comp_d d2 = mHm(1,1);
   const comp_d d3 = mHm(2,2);
   // make sure they are ALMOST real
-  if ((std::imag(d1) > TOL) || 
+  if ((std::imag(d1) > TOL) ||
       (std::imag(d2) > TOL) ||
       (std::imag(d3) > TOL))
     std::cout << "OH NO!" << std::endl;
@@ -652,7 +550,7 @@ Polar getLineReflectionPolar(const CompMat3& M, const CompMat3& H)
   const comp_d d2 = mHm(2,2);
 
   // make sure they are ALMOST real
-  if ((std::imag(d0) > TOL) || 
+  if ((std::imag(d0) > TOL) ||
       (std::imag(d1) > TOL) ||
       (std::imag(d2) > TOL))
     std::cout << "OH NO!" << std::endl;
@@ -666,7 +564,7 @@ Polar getLineReflectionPolar(const CompMat3& M, const CompMat3& H)
     odd_one_out = 0;
   else if (std::abs(eigval[2] - eigval[0]) < TOL)
     odd_one_out = 1;
-  
+
   v_pos << eigvec(0,odd_one_out) << arma::endr
         << eigvec(1,odd_one_out) << arma::endr
         << eigvec(2,odd_one_out) << arma::endr;
@@ -705,7 +603,7 @@ void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
   {
     pos = 2; null_1 = 0; null_2 = 1;
   }
-  
+
   p1 << eigvec(0,null_1) << arma::endr
      << eigvec(1,null_1) << arma::endr
      << eigvec(2,null_1) << arma::endr;
@@ -723,153 +621,15 @@ void FindIsometryThatFixes(const Point& p,
                            const std::vector<std::string>& Names,
                            const CompMat3& H)
 {
-  for (unsigned int i = 0; i < upto; ++i)
-  {
-    if (!IsWordMinimal(i, Mats.size()))
-      continue;
-    CompMat3 temp = WordToMatrix(i, Mats);
-    const Point Mp = temp * p;
+  // for (unsigned int i = 0; i < upto; ++i)
+  // {
+  //   if (!IsWordMinimal(i, Mats.size()))
+  //     continue;
+  //   CompMat3 temp = WordToMatrix(i, Mats);
+  //   const Point Mp = temp * p;
 
-    if (arma::approx_equal(normalize(Mp), normalize(p), "absdiff", TOL))
-      std::cout << HumanWord(i, Names) << ": "
-                << GetIsomClassStr(temp, H) << std::endl;
-  }
-}
-
-CompMat3 WordToMatrix(const unsigned int word,
-                      const std::vector<CompMat3>& Mats)
-{
-  int w = word - 1;
-  size_t len = 2 * Mats.size();
-  CompMat3 mat = arma::eye<CompMat3>(3,3);
-  while(w >= 0)
-  {
-    const int e = w % len;
-    if ((e % 2) == 0)
-      mat *= Mats[e / 2];
-    else
-      mat *= arma::inv(Mats[e / 2]);
-    w /= len;
-    if (w == 0)
-      break;
-    w -= 1;
-  }
-  return mat;  
-}
-
-std::string HumanWord(const unsigned int word,
-                      const std::vector<std::string>& Names)
-{
-  if (word == 0)
-    return "Id";
-
-  int w = word - 1;
-  std::string s;
-  size_t len = 2 * Names.size();
-  while(w >= 0)
-  {
-    const int e = w % len;
-    if ((e % 2) == 0)
-      s.append(Names[e / 2]);
-    else
-    {
-      s.append(Names[e / 2]);
-      s.append("`");
-    }
-    w /= len;
-    if (w == 0)
-      break;
-    w -= 1;
-  }
-  return s;
-}
-
-unsigned int StringToCode(const std::string word,
-                          const std::vector<std::string>& Names)
-{
-  if (word == "Id")
-    return 0;
-
-  unsigned int w = 0;
-  unsigned int pos = 0;
-
-  size_t tot_names = Names.size();
-  size_t len = word.length();
-
-  int from = 0;
-  while (from < len)
-  {
-    bool inverse = false;
-    const std::string c = word.substr(from, 1);
-    ++from;
-    // check if next char is `
-    const std::string inv = word.substr(from, 1);
-    if (inv == "`")
-    {
-      inverse = true;
-      ++from;
-    }
-    unsigned int i = 0;
-    for (i = 0; i < Names.size(); ++i)
-    {
-      if (c == Names[i])
-      {
-        int bin = (2 * i) + (inverse ? 1 : 0) + 1;
-        w += (std::pow(2 * tot_names, pos)) * bin;
-        break;
-      }
-    }
-    ++pos;
-  }
-  return w;
-}
-
-
-bool CheckWordsAlt(const std::vector<CompMat3>& Mats,
-                   const CompMat3& H,
-                   bool& SeenParabolic)
-{
-  for (size_t i = 0; i < Mats.size(); ++++i)
-  {
-    CompMat3 test = Mats[i];
-    if (is_non_finite_elliptic(test, H))
-      return false;
-
-    const IsomClass iclass = GetIsomClass(test, H);
-
-    if ((iclass == IsomClass::ParabolicPure) ||
-        (iclass == IsomClass::ParabolicScrew))
-    {
-      SeenParabolic = true;
-      continue;
-    }
-  }
-  return true;
-}
-
-void getShortWords(const std::vector<CompMat3>& Generators,
-                   std::vector<CompMat3>& Matrices,
-                   const size_t upto)
-{
-  Matrices.reserve(upto);
-  for (unsigned int i = 0; i <= upto; ++i)
-  {
-    if (!IsWordMinimal(i, Generators.size()))
-       continue;
-
-    const CompMat3 A = WordToMatrix(i, Generators);
-    bool seen = false;
-    int j = 0;
-    for (j = 0; j < Matrices.size(); ++j)
-    {
-      const CompMat3 B = Matrices[j];
-      seen = areEqual(A, B);
-      if (seen)
-        break;
-    }
-
-    if (!seen)
-      Matrices.push_back(A);
-  }
-  return;
+  //   if (arma::approx_equal(normalize(Mp), normalize(p), "absdiff", TOL))
+  //     std::cout << HumanWord(i, Names) << ": "
+  //               << GetIsomClassStr(temp, H) << std::endl;
+  // }
 }

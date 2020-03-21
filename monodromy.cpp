@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
       std::cout << gd.print() << std::endl;
 
 
-    // std::cout << (jorgensen_new(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
+    // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
     summary(new_Words);
 
     std::cout << std::endl << std::endl;

@@ -45,16 +45,7 @@ std::string GroupDescription::print()
   s.append(", ");
   s.append(word3);
   s.append(">");
-/*
-  std::vector<std::string> names {"A", "B"};
-  s.append(" <");
-  s.append(std::to_string(StringToCode(word1, names)));
-  s.append(", ");
-  s.append(std::to_string(StringToCode(word2, names)));
-  s.append(", ");
-  s.append(std::to_string(StringToCode(word3, names)));
-  s.append(">");
-*/
+
   return s;
 }
 

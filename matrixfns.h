@@ -41,30 +41,6 @@ bool isPower(const CompMat3& A, const CompMat3& B,
 int Braid(const CompMat3& A, const CompMat3& B,
           const unsigned int max_braid = MAX_BRAID);
 mat_sig get_mat_sig(const CompMat3& matrix, const double tol=TOL);
-bool is_non_finite_elliptic(const CompMat3& m, const CompMat3& H);
-CompMat3 WordToMatrix(const unsigned int word,
-                      const std::vector<CompMat3>& Mats);
-bool CheckWords2(const unsigned int upto,
-                 const std::vector<CompMat3>& Mats,
-                 const CompMat3& H,
-                 bool& SeenParabolic);
-bool CheckWordsAlt(const std::vector<CompMat3>& Mats,
-                   const CompMat3& H,
-                   bool& SeenParabolic);
-void getShortWords(const std::vector<CompMat3>& Generators,
-                   std::vector<CompMat3>& Matrices,
-                   const size_t upto = 1000);
-std::string HumanWord(const unsigned int word,
-                      const std::vector<std::string>& Names);
-bool IsWordMinimal(const unsigned int word,
-                   const size_t n);
-void printShortWords(const unsigned int upto,
-                     const std::vector<CompMat3>& Mats,
-                     const std::vector<std::string>& Names,
-                     const CompMat3& H,
-                     const bool skip_loxo = true);
-unsigned int StringToCode(const std::string word,
-                          const std::vector<std::string>& Names);
 
 comp_d herm(const Point& p1, const Point& p2, const CompMat3& H);
 comp_d crossprod(const Point& z1, const Point& z2,
