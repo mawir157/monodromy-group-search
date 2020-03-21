@@ -1,13 +1,14 @@
 #pragma once
 #include "matrixfns.h"
+#include "word.h"
 
 class GroupDescription
 {
   public:
     GroupDescription();
-    CompMat3 R1;
-    CompMat3 R2;
-    CompMat3 R3;
+    CompMat3 M1;
+    CompMat3 M2;
+    CompMat3 M3;
     int R1_ord;
     int R2_ord;
     int R3_ord;
@@ -23,27 +24,12 @@ class GroupDescription
     int braid3212;
     bool ok;
 
-    void find(const std::vector<CompMat3>& Mats,
-              const std::vector<std::string>& Names,
-              const CompMat3& H,
-              const unsigned int seed,
-              const unsigned int upto = MAX_WORD);
-    void better_find(const std::vector<CompMat3>& Mats,
-                     const std::vector<std::string>& Names,
-                     const CompMat3& H,
-                     const int ref_order,
-                     const unsigned int upto = MAX_WORD);
-    void even_better_find(const std::vector<CompMat3>& Mats,
-                          const std::vector<std::string>& Names,
-                          const CompMat3& H,
-                          const int ref_order,
-                          const unsigned int upto = MAX_WORD);
-    void calc(const std::vector<CompMat3>& Mats,
-              const std::vector<std::string>& Names,
-              const CompMat3& H,
-              const std::string w_1,
-              const std::string w_2,
-              const std::string w_3);
+    void find_alt(const std::vector<Word>& words,
+                  const int min_braid,
+                  const int reflection_order = -1);
     void reset();
     std::string print();
+  private:
+    std::vector<Word> remove_non_reflections(const std::vector<Word>& words,
+                                             const bool allow_ref_points = false);
 };

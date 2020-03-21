@@ -44,25 +44,14 @@ int main(int argc, char *argv[])
     std::cout << (CheckWords(new_Words, para) ? "" : " / NON-DISCRETE!");
     std::cout << (para ? " / PARABOLIC" : "") << std::endl;
 
+    GroupDescription gd;
+    gd.find_alt(new_Words, 2, groups[i].get_ref_order());
+    if (gd.ok)
+      std::cout << gd.print() << std::endl;
+
+
     // std::cout << (jorgensen_new(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
     summary(new_Words);
-
-    // std::vector<std::string> names {"A", "B"};
-
-    // para = false;
-    // std::cout << groups[i].print()
-    //           << (CheckWords2(std::pow(4, 9), mats, H, para) ? "" : " | NON-DISCRETE!");
-    // std::cout << (para ? " | PARABOLIC" : "") << std::endl;
-    // jorgensen_wrapper(mats, H, std::pow(4, 11), true);
-    // std::cout << (jorgensen_all(mats, H, std::pow(4, 9)) ? "*PASSED" : "*FAILED") << std::endl;
-
-    // GroupDescription gd;
-    // gd.calc(mats, names, H, "BA`", "ABA`A`", "A`B");
-    // std::cout << gd.print() << std::endl;
-    // {
-    //   gd.even_better_find(mats, names, H, groups[i].get_ref_order(), 4096);
-    //   std::cout << gd.print() << std::endl;
-    // }
 
     std::cout << std::endl << std::endl;
   }
