@@ -2,7 +2,7 @@
 
 std::vector<Word> get_words_upto_n(const unsigned int n,
                                    const std::vector<Word>& gens,
-                                   const CompMat3& H,
+                                   std::shared_ptr<const CompMat3> H,
                                    const bool verbose)
 {
   size_t i = 0;

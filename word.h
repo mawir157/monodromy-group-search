@@ -6,11 +6,11 @@ class Word
 {
   public:
     // empty constructor creates identity word
-    Word(CompMat3 H_matrix);
+    Word(std::shared_ptr<const CompMat3> H_matrix);
     // full constructor (probably never used, except for generators)
     Word(std::vector<Generator> gen_vec,
          CompMat3 matrix,
-         CompMat3 H_matrix,
+         std::shared_ptr<const CompMat3> H_matrix,
          IsomClass iso_class,
          comp_d trace,
          int order);
@@ -36,13 +36,14 @@ class Word
 
     // inplace conjugation
     void conjugate(const Word& P);
-    
+
     // getters
     int get_order() const { return m_order; }
     IsomClass get_isom_class() const { return m_iso_class; }
     std::string str_isom_class() const;
     CompMat3 get_matrix() const { return m_matrix; }
-    CompMat3 get_H_matrix() const { return m_H_matrix; }
+    const CompMat3 get_H_matrix() const { return *(m_H_matrix.get()); }
+    std::shared_ptr<const CompMat3> p_H_matrix() const { return m_H_matrix; }
     comp_d get_trace() const { return m_trace; }
     std::vector<Generator> get_gen_vec() const { return m_gen_vec; }
     bool is_non_finite_elliptic() const;
@@ -53,12 +54,12 @@ class Word
     bool operator>(const Word& wd) const;
 
   private:
-    CompMat3               m_matrix;
-    CompMat3               m_H_matrix;
-    std::vector<Generator> m_gen_vec;
-    IsomClass              m_iso_class;
-    comp_d                 m_trace;
-    int                    m_order;
+    CompMat3                        m_matrix;
+    std::shared_ptr<const CompMat3> m_H_matrix;
+    std::vector<Generator>          m_gen_vec;
+    IsomClass                       m_iso_class;
+    comp_d                          m_trace;
+    int                             m_order;
 };
 
 Word conjugate(const Word& base_word, const Word& conj_word);
