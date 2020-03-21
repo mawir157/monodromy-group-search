@@ -8,6 +8,8 @@
 #include "geometry.h"
 #include "polytope.h"
 #include "jorgensen.h"
+#include "getwordsupton.h"
+#include "word.h"
 
 #include <stdlib.h>
 
@@ -15,28 +17,49 @@ int main(int argc, char *argv[])
 {
   std::vector<ParsedLine> groups = parseFile("./groups.txt");
 
+  bool para = false;
   for (size_t i = 0; i < groups.size(); ++i)
   {
     auto [ A, B, H ] = groups[i].toMatrices();
 
     mat_sig sig = get_mat_sig(H);
     std::vector<CompMat3> mats {A, B};
-    std::vector<std::string> names {"A", "B"};
-    bool para = false;
 
-    std::cout << groups[i].print()
-              << (CheckWords2(std::pow(4, 9), mats, H, para) ? "" : " | NON-DISCRETE!");
-    std::cout << (para ? " | PARABOLIC" : "") << std::endl;
-    jorgensen_wrapper(mats, H, std::pow(4, 11), true);
-    std::cout << (jorgensen_all(mats, H, std::pow(4, 9)) ? "*PASSED" : "*FAILED") << std::endl;
+    std::vector<Generator> v_a {Generator::A};
+    Word word_A(v_a, A, H, GetIsomClass(A,H), arma::trace(A), Order(A,H));
+    Word word_Ai = word_A.invert();
 
-    GroupDescription gd;
-    gd.calc(mats, names, H, "BA`", "ABA`A`", "A`B");
-    std::cout << gd.print() << std::endl;
-    {
-      gd.even_better_find(mats, names, H, groups[i].get_ref_order(), 4096);
-      std::cout << gd.print() << std::endl;
-    }
+    std::vector<Generator> v_b {Generator::B};
+    Word word_B(v_b, B, H, GetIsomClass(B,H), arma::trace(B), Order(B,H));
+    Word word_Bi = word_B.invert();
+
+    std::vector<Word> gen_words {word_A, word_Ai, word_B, word_Bi};
+
+    std::vector<Word> new_Words = get_words_upto_n(11, gen_words, H);
+    std::cout << new_Words.size() << std::endl;
+
+    std::cout << (CheckWords(new_Words, para) ? "" : " / NON-DISCRETE!");
+    std::cout << (para ? " / PARABOLIC" : "") << std::endl;
+
+    // std::cout << (jorgensen_new(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
+    summary(new_Words);
+
+    // std::vector<std::string> names {"A", "B"};
+
+    // para = false;
+    // std::cout << groups[i].print()
+    //           << (CheckWords2(std::pow(4, 9), mats, H, para) ? "" : " | NON-DISCRETE!");
+    // std::cout << (para ? " | PARABOLIC" : "") << std::endl;
+    // jorgensen_wrapper(mats, H, std::pow(4, 11), true);
+    // std::cout << (jorgensen_all(mats, H, std::pow(4, 9)) ? "*PASSED" : "*FAILED") << std::endl;
+
+    // GroupDescription gd;
+    // gd.calc(mats, names, H, "BA`", "ABA`A`", "A`B");
+    // std::cout << gd.print() << std::endl;
+    // {
+    //   gd.even_better_find(mats, names, H, groups[i].get_ref_order(), 4096);
+    //   std::cout << gd.print() << std::endl;
+    // }
 
     std::cout << std::endl << std::endl;
   }
@@ -101,7 +124,7 @@ int main(int argc, char *argv[])
 
       if (isPower(M1, M2) || isPower(M2, M1))
         continue;
-            
+
       for (int word = 0; word < 1000; ++word)
       {
         if (!IsWordMinimal(word, mats.size()))
@@ -121,8 +144,8 @@ int main(int argc, char *argv[])
             break;
           }
         }
-      }      
-    }    
+      }
+    }
   }
 
   CompMat3 test = conj(B * arma::inv(A), B * B);
@@ -210,7 +233,7 @@ int main(int argc, char *argv[])
         {
           for(it_b2 = rs.begin(); it_b2 != rs.end(); ++it_b2)
           {
-            if (*it_b2 <= *it_b1) { continue; }  
+            if (*it_b2 <= *it_b1) { continue; }
             for(it_b3 = rs.begin(); it_b3 != rs.end(); ++it_b3)
             {
               if (*it_b3 <= *it_b2) { continue; }
@@ -259,14 +282,14 @@ int main(int argc, char *argv[])
                   std::cout << "[" << count << " ("
                             << 100 * count / std::pow(1.0*rs.size(), 6.0)
                             << "%) ] " << "("
-                            << (*it_a1).asString() << ", " 
-                            << (*it_a2).asString() << ", " 
+                            << (*it_a1).asString() << ", "
+                            << (*it_a2).asString() << ", "
                             << (*it_a3).asString()
                             << " | "
-                            << (*it_b1).asString() << ", " 
-                            << (*it_b2).asString() << ", " 
+                            << (*it_b1).asString() << ", "
+                            << (*it_b2).asString() << ", "
                             << (*it_b3).asString()
-                            << ") [" 
+                            << ") ["
                             << time / count << "ms per group, expected time to finish: "
                             << strToEnd
                             << "]" << std::endl;
@@ -320,24 +343,24 @@ int main(int argc, char *argv[])
                   if (gd.ok)
                   {
                     std::cout << "("
-                              << (*it_a1).asString() << ", " 
-                              << (*it_a2).asString() << ", " 
+                              << (*it_a1).asString() << ", "
+                              << (*it_a2).asString() << ", "
                               << (*it_a3).asString()
                               << " | "
-                              << (*it_b1).asString() << ", " 
-                              << (*it_b2).asString() << ", " 
+                              << (*it_b1).asString() << ", "
+                              << (*it_b2).asString() << ", "
                               << (*it_b3).asString()
                               << ") | ";
                     std::cout << (1.0 * seen) / count << std::endl;
                     std::cout << gd.print() << std::endl;
 
 //                    output_file << "("
-//                                << (*it_a1).asString() << ", " 
-//                                << (*it_a2).asString() << ", " 
+//                                << (*it_a1).asString() << ", "
+//                                << (*it_a2).asString() << ", "
 //                                << (*it_a3).asString()
 //                                << " | "
-//                                << (*it_b1).asString() << ", " 
-//                                << (*it_b2).asString() << ", " 
+//                                << (*it_b1).asString() << ", "
+//                                << (*it_b2).asString() << ", "
 //                                << (*it_b3).asString()
 //                                << ") | ";
 //                    output_file << gd.print() << std::endl;

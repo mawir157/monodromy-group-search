@@ -3,6 +3,26 @@
 #include "matrixfns.h"
 #include "geometry.h"
 
+Generator inverse(const Generator gen)
+{
+    switch (gen)
+    {
+      case Generator::R1: return Generator::E1; break;
+      case Generator::R2: return Generator::E2; break;
+      case Generator::R3: return Generator::E3; break;
+      case Generator::E1: return Generator::R1; break;
+      case Generator::E2: return Generator::R2; break;
+      case Generator::E3: return Generator::R3; break;
+      //
+      case Generator::A:  return Generator::Ai; break;
+      case Generator::Ai: return Generator::A;  break;
+      case Generator::B:  return Generator::Bi; break;
+      case Generator::Bi: return Generator::B;  break;
+      //
+      case Generator::ID: return Generator::ID; break;
+    }
+}
+
 CompMat3 TripleToMatrix(const Triple T,
                         const bool norm)
 {
@@ -88,16 +108,22 @@ double goldman(const comp_d& t)
 bool isId(const CompMat3& matrix)
 {
   CompMat3 id = arma::eye<CompMat3>(3,3);
-  if (arma::approx_equal(matrix, id, "absdiff", TOL))
+  return areEqual(matrix, id);
+}
+
+
+bool traceEqual(const comp_d& trace_a, const comp_d& trace_b)
+{
+  if (std::abs(trace_a - trace_b) < TOL)
     return true;
 
-  if (arma::approx_equal(matrix, omega * id, "absdiff", TOL))
+  if (std::abs(trace_a - omega * trace_b) < TOL)
     return true;
 
-  if (arma::approx_equal(matrix, omega * omega * id, "absdiff", TOL))
+  if (std::abs(trace_a - omega * omega * trace_b) < TOL)
     return true;
 
-  return false;
+  return false;  
 }
 
 bool areEqual(const CompMat3& A, const CompMat3& B)
@@ -196,28 +222,20 @@ std::string GetIsomClassStr(const CompMat3& m, const CompMat3& H)
   return "ERROR!";
 }
 
-IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H, const bool debug)
+IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H)
 {
-// if (debug)
-//   std::cout << "m = " << std::endl << m << std::endl;
-
-// if (debug)
-//   std::cout << "order = " << Order(m, H) << std::endl;
-
   if (isId(m))
     return IsomClass::Identity;
 
   comp_d tr = arma::trace(m);
-// if (debug)
-//   std::cout << "trace = " << tr << std::endl;
+
   if ((std::abs(tr - 3.0) < TOL) ||
       (std::abs(tr - 3.0 * omega) < TOL) ||
       (std::abs(tr - 3.0 * omega * omega) < TOL))
     return IsomClass::ParabolicPure;
 
   double gman = goldman(tr);
-// if (debug)
-//   std::cout << "goldman = " << gman << std::endl;
+
   if (gman > LOWER_TOL)
     return IsomClass::Loxodromic;
 
@@ -233,17 +251,6 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H, const bool debug)
     arma::cx_mat eigvec;
 
     arma::eig_gen(eigval, eigvec, m);
-
-// if (debug)
-// {
-//   std::cout << "e-vals" << std::endl << eigval << std::endl;
-//   std::cout << std::abs(eigval[0] - eigval[1]) << std::endl;
-//   std::cout << std::abs(eigval[1] - eigval[2]) << std::endl;
-//   std::cout << std::abs(eigval[2] - eigval[0]) << std::endl;
-// }
-
-// if (debug)
-//   std::cout << "e-vecs" << std::endl << eigvec << std::endl;
 
     int i_1 = -1;
     int i_2 = -1;
@@ -277,15 +284,9 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H, const bool debug)
 
     CompMat3 mHm = eigvec.t() * H * eigvec;
 
-// if (debug)
-//   std::cout << "pairwise" << std::endl << mHm << std::endl;
-
     const double r1 = std::real(mHm(i_1, i_1));
     const double r2 = std::real(mHm(i_2, i_2));
     const double s = std::real(mHm(j, j));
-
-// if (debug)
-//   std::cout << "r1 & r2 = " << r1 << " & " << r2 << std::endl;
 
     if ((std::abs(r1) < TOL) || (std::abs(r2) < TOL))
     {
