@@ -303,28 +303,6 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H)
       {
 
         std::cout << "Not a parabolic!" << std::endl;
-        std::cout << eigval << std::endl;
-
-        std::cout << r1 << "    "
-                  << r2 << std::endl;
-
-        std::cout << std::abs(r1) << "     "
-                  << std::abs(r2) << "     "
-                  << s << std::endl;
-
-        std::cout << m << std::endl;
-
-        std::cout << mHm << std::endl;
-
-        std::cout << arma::trace(m) << std::endl;
-        std::cout << goldman(arma::trace(m)) << std::endl;
-
-        std::cout << base_order(m, MAX_ORDER) << std::endl;
-
-        Point p1 = getEllipticFixedPoint(m, H);
-        std::cout << normalize(p1) << std::endl;
-        std::cout << normalize(m * p1) << std::endl;
-        std::cout << "==================" << std::endl;
 
         return IsomClass::Failure;
       }
