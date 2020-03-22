@@ -2,10 +2,11 @@
 
 #include "word.h"
 
-std::vector<Word> get_words_upto_n(const unsigned int n,
-	                               const std::vector<Word>& gens,
-                                   std::shared_ptr<const CompMat3> H,
-	                               const bool verbose=true);
+bool get_words_upto_n(const unsigned int n,
+	                    const std::vector<Word>& gens,
+	                    std::shared_ptr<const CompMat3> H,
+	                    std::vector<Word>& seen_words,
+	                    const bool get_all = true);
 
 bool CheckWords(const std::vector<Word>& Words,
                 bool& SeenParabolic);

@@ -245,6 +245,11 @@ Word conjugate(const Word& base_word, const Word& conj_word)
 Word Word::operator*(const Word& wd) const
 {
   CompMat3 new_mat = m_matrix * wd.get_matrix();
+  for(auto val : new_mat)
+  {
+    if (std::abs(val) < TOL)
+      val = c_zero;
+  }
 
   IsomClass i_class = GetIsomClass(new_mat, this->get_H_matrix());
 

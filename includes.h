@@ -16,8 +16,7 @@
 #include <tuple>
 #include <vector>
 
-#include <math.h> 
-
+#include <math.h>
 
 typedef std::complex<double> comp_d;
 typedef arma::Mat<comp_d> CompMat3;
@@ -26,8 +25,10 @@ typedef arma::cx_dvec Polar;
 
 static const double PI = 3.14159265358979323;
 static const comp_d omega(-1.0 / 2.0, std::sqrt(3.0) / 2.0);
+static const comp_d c_zero(0.0, 0.0);
 static const double LOWER_TOL = 1e-10;
 static const double TOL = 1e-6;
 static const unsigned int MAX_ORDER = 1000;
 static const unsigned int MAX_BRAID = 1000;
-static const unsigned int MAX_WORD  = 65536;
+
+enum RunMode { file, loop, unknown };

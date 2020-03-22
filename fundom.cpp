@@ -29,8 +29,8 @@ void FunDom::print() const
       std::cout << "**********************************************" << std::endl;
       std::cout << images[i] << std::endl;
       std::cout << base <<std::endl;
-      const comp_d t = (herm(images[i], base, H) * herm(base, images[i], H)) / 
-                   (herm(images[i], images[i], H) * herm(base, base, H));      
+      const comp_d t = (herm(images[i], base, H) * herm(base, images[i], H)) /
+                   (herm(images[i], images[i], H) * herm(base, base, H));
       std::cout << "<><> / <><> = " << std::real(t) << std::endl;
       std::cout << "sqrt(<><>/<><>)" << std::sqrt(std::real(t)) << std::endl;
     }
@@ -44,7 +44,7 @@ bool FunDom::stochastic_lattice(unsigned int n, bool verbose)
   std::vector<Point> null_vectors;
 
   double lower_bound = -10;
-  double upper_bound = 10; 
+  double upper_bound = 10;
   std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
   std::random_device rd;
   std::mt19937 gen(rd());

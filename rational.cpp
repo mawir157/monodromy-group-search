@@ -89,7 +89,7 @@ Triple Triple::rot_by_pi() const
   int new_m2 = 2 * r2.m + r2.n;
   unsigned int new_n2 = 2 * r2.n;
   if (2 * r2.m + r2.n >= 2 * r2.n)
-    new_m2 -= 2 * r2.n; 
+    new_m2 -= 2 * r2.n;
   if ((new_m2 % 2 == 0))
   {
     new_m2 /= 2;
@@ -117,7 +117,7 @@ bool Triple::is_minimal() const
   Triple r = rot_by_pi();
   Triple rc = r.conj();
 
-  return ((score() <= c.score()) && 
+  return ((score() <= c.score()) &&
           (score() <= r.score()) &&
           (score() <= rc.score()));
 }

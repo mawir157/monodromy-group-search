@@ -53,13 +53,19 @@ void GroupDescription::find_alt(const std::vector<Word>& words,
                                 const int min_braid,
                                 const int reflection_order)
 {
+  reset();
   std::vector<Word> reduced_words = remove_non_reflections(words);
+  if (reduced_words.size() == 0)
+  {
+    std::cout << "No reflections found" << std::endl;
+    return;
+  }
+
   const CompMat3 H = reduced_words[0].get_H_matrix();
 
   std::vector<int> ref_ords;
   if (reflection_order == -1)
   {
-    ref_ords.push_back(2); //TODO
     for (size_t i = 0; i < reduced_words.size(); ++i)
       ref_ords.push_back(reduced_words[i].get_order());
 

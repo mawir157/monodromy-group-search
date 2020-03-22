@@ -1,29 +1,31 @@
 #include "getwordsupton.h"
 
-std::vector<Word> get_words_upto_n(const unsigned int n,
-                                   const std::vector<Word>& gens,
-                                   std::shared_ptr<const CompMat3> H,
-                                   const bool verbose)
+bool get_words_upto_n(const unsigned int n,
+                      const std::vector<Word>& gens,
+                      std::shared_ptr<const CompMat3> H,
+                      std::vector<Word>& seen_words,
+                      const bool get_all)
 {
   size_t i = 0;
-  std::vector<Word> seen_words;
+  size_t block_start = 0;
+  seen_words.clear();
   seen_words.reserve(1000000);
-  seen_words.push_back(Word(H));
+  seen_words.push_back(Word(H)); // the identity
 
   while (i < n)
   {
-    std::vector<Word> seen_words_n_minus_1;
-    seen_words_n_minus_1.reserve(1000000);
-    for (size_t j = 0; j < seen_words.size(); ++j)
+    // std::vector<Word> seen_words_n_minus_1;
+    // seen_words_n_minus_1.reserve(1000000);
+    // for (size_t j = 0; j < seen_words.size(); ++j)
+    // {
+    //   const Word test_word = seen_words[j];
+    //   if (test_word.word_length() == i)
+    //     seen_words_n_minus_1.push_back(test_word);
+    // }
+    size_t temp = seen_words.size();
+    for (size_t j = block_start; j < temp; ++j)
     {
-      const Word test_word = seen_words[j];
-      if (test_word.word_length() == i)
-        seen_words_n_minus_1.push_back(test_word);
-    }
-
-    for (size_t j = 0; j < seen_words_n_minus_1.size(); ++j)
-    {
-      const Word base_word = seen_words_n_minus_1[j];
+      const Word base_word = seen_words[j];
       const Generator base_last = base_word.last_element();
 
       for (size_t k = 0; k < gens.size(); ++k)
@@ -36,6 +38,13 @@ std::vector<Word> get_words_upto_n(const unsigned int n,
 
         // get a new word by multiplying the generator to the base word
         const Word new_word = base_word * new_gen;
+
+        if (!get_all && new_word.is_non_finite_elliptic())
+        {
+          // std::cout << new_word.as_string()
+          //           << " is infinite order elliptic." << std::endl;
+          return false;
+        }
 
         // check if we've seen this before!
         bool seen = false;
@@ -51,13 +60,14 @@ std::vector<Word> get_words_upto_n(const unsigned int n,
 
         if (!seen)
           seen_words.push_back(new_word);
-      }
 
+      }
     }
+    block_start = temp;
     i += 1;
   }
 
-  return seen_words;
+  return true;;
 }
 
 bool CheckWords(const std::vector<Word>& Words,

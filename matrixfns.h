@@ -7,6 +7,7 @@ struct mat_sig
 {
   mat_sig(unsigned int p, unsigned int n, unsigned int g);
   std::string asString() const;
+  bool match(unsigned int pos, unsigned int nul, unsigned int neg) const;
 
   unsigned int m_pos;
   unsigned int m_nul;
@@ -32,6 +33,7 @@ double goldman(const comp_d& t);
 bool isId(const CompMat3& matrix);
 bool areEqual(const CompMat3& A, const CompMat3& B);
 bool traceEqual(const comp_d& trace_a, const comp_d& trace_b);
+int base_order(const CompMat3& m, const int max_order = MAX_ORDER);
 int Order(const CompMat3& m, const CompMat3& H,
           const int max_order = MAX_ORDER);
 CompMat3 conj(const CompMat3 A, const CompMat3 P);

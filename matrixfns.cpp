@@ -140,6 +140,20 @@ bool areEqual(const CompMat3& A, const CompMat3& B)
   return false;
 }
 
+int base_order(const CompMat3& m, const int max_order)
+{
+  CompMat3 m_copy = m;
+
+  for (int i = 2; i < max_order; ++i)
+  {
+    m_copy = m_copy * m;
+    if (isId(m_copy))
+      return i;
+  }
+
+  return -2;
+}
+
 int Order(const CompMat3& m, const CompMat3& H, const int max_order)
 {
   if (isId(m))
@@ -151,16 +165,7 @@ int Order(const CompMat3& m, const CompMat3& H, const int max_order)
       (cl != IsomClass::ReflectionLine))
     return -1;
 
-  CompMat3 m_copy = m;
-
-  for (int i = 2; i < max_order; ++i)
-  {
-    m_copy = m_copy * m;
-    if (isId(m_copy))
-      return i;
-  }
-
-  return -2;
+  return base_order(m);
 }
 
 CompMat3 conj(const CompMat3 A, const CompMat3 P)
@@ -286,15 +291,19 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H)
 
     const double r1 = std::real(mHm(i_1, i_1));
     const double r2 = std::real(mHm(i_2, i_2));
-    const double s = std::real(mHm(j, j));
+    const double s  = std::real(mHm(j, j));
 
     if ((std::abs(r1) < TOL) || (std::abs(r2) < TOL))
     {
+      return IsomClass::ParabolicScrew;
+
       if (s > TOL)
         return IsomClass::ParabolicScrew;
       else
       {
+
         std::cout << "Not a parabolic!" << std::endl;
+
         return IsomClass::Failure;
       }
 
@@ -414,6 +423,11 @@ std::string mat_sig::asString() const
   s.append(")");
 
   return s;
+}
+
+bool mat_sig::match(unsigned int pos, unsigned int nul, unsigned int neg) const
+{
+  return ((m_pos == pos) && (m_nul == nul) && (m_neg == neg));
 }
 
 mat_sig get_mat_sig(const CompMat3& matrix, const double tol)

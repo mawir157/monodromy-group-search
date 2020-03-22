@@ -1,5 +1,5 @@
 #pragma once
-#include "matrixfns.h"
+
 #include "word.h"
 
 class GroupDescription
