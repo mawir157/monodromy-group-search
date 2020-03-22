@@ -16,7 +16,7 @@
 #include <tuple>
 #include <vector>
 
-#include <math.h> 
+#include <math.h>
 
 typedef std::complex<double> comp_d;
 typedef arma::Mat<comp_d> CompMat3;
@@ -31,4 +31,4 @@ static const double TOL = 1e-6;
 static const unsigned int MAX_ORDER = 1000;
 static const unsigned int MAX_BRAID = 1000;
 
-enum RunMode { file, loop, unknown }; 
+enum RunMode { file, loop, unknown };

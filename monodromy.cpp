@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
   if (mode == RunMode::loop)
   {
-    
+
     const std::vector<Generator> v_a {Generator::A};
     const std::vector<Generator> v_b {Generator::B};
 
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
                 if (sig.match(2, 0, 1))
                   continue;
 
-                std::shared_ptr<const CompMat3> p_H = 
+                std::shared_ptr<const CompMat3> p_H =
                                             std::make_shared<const CompMat3>(H);
 
                 const Word word_A(v_a, A, p_H, GetIsomClass(A,H),
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
                   std::cout << std::endl;
                 }
               }
-            }          
+            }
           }
         }
       }

@@ -9,7 +9,7 @@ CWCell::CWCell(const std::string name, const unsigned int id,
                const std::vector<CWCell>& b,const unsigned int dim) :
     name(name)
   , id(id)
-  , dim(dim) 
+  , dim(dim)
   , boundary(b) {};
 
 int CWCell::Euler() const
@@ -21,7 +21,7 @@ int CWCell::Euler() const
   {
     const CWCell complex = boundary[i];
     cell_count[complex.dim].insert(complex.id);
-    if (complex.dim != 0) 
+    if (complex.dim != 0)
       EulerRecursive(complex.boundary, cell_count);
   }
 
@@ -42,7 +42,7 @@ void EulerRecursive(const std::vector<CWCell>& boundary,
   {
     const CWCell complex = boundary[i];
     cell_count[complex.dim].insert(complex.id);
-    if (complex.dim != 0) 
+    if (complex.dim != 0)
       EulerRecursive(complex.boundary, cell_count);
   }
 }
