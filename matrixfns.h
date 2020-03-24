@@ -55,3 +55,5 @@ Point getEllipticFixedPoint(const CompMat3& M, const CompMat3& H);
 Point getLineReflectionPolar(const CompMat3& M, const CompMat3& H);
 void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
                         Point& p1, Point& p2);
+
+void RemoveNearZeros(CompMat3& M, const double tol=LOWER_TOL);

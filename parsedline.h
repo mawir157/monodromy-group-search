@@ -37,3 +37,6 @@ class ParsedLine
 
 std::vector<ParsedLine> parseFile(const std::string filename,
 	                                const bool verbose = false);
+
+std::string GenerateFileName(const std::string directory = "output",
+														 const std::string label = "");

@@ -301,7 +301,6 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H)
         return IsomClass::ParabolicScrew;
       else
       {
-
         std::cout << "Not a parabolic!" << std::endl;
 
         return IsomClass::Failure;
@@ -324,7 +323,9 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H)
     if ((r1 > TOL) && (r2 > TOL))
     {
       if (std::abs(rcross) < TOL)
+      {
         return IsomClass::ReflectionPoint;
+      }
       else
         return IsomClass::ReflectionLine;
     }
@@ -627,4 +628,17 @@ void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
      << eigvec(2,null_2) << arma::endr;
 
   return;
+}
+
+void RemoveNearZeros(CompMat3& M, const double tol)
+{
+  for(auto& val : M)
+  {
+    if (std::abs(val) < LOWER_TOL)
+      val = c_zero;
+    else if (std::abs(std::real(val)) < LOWER_TOL)
+      val = comp_d(0.0, std::imag(val));
+    else if (std::abs(std::imag(val)) < LOWER_TOL)
+      val = comp_d(std::real(val), 0.0);
+  }
 }

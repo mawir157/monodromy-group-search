@@ -5,17 +5,14 @@
 class GroupDescription
 {
   public:
-    GroupDescription();
-    CompMat3 M1;
-    CompMat3 M2;
-    CompMat3 M3;
+    GroupDescription(std::shared_ptr<const CompMat3> H);
+    Word R1;
+    Word R2;
+    Word R3;
     int R1_ord;
     int R2_ord;
     int R3_ord;
     int R123_ord;
-    std::string word1;
-    std::string word2;
-    std::string word3;
     int braid12;
     int braid23;
     int braid31;

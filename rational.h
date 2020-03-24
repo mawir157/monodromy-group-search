@@ -8,7 +8,7 @@ class Rational
     comp_d exp() const;
     bool operator<=(const Rational& r) const {return value() <= r.value();}
     bool operator<(const Rational& r) const {return value() < r.value();}
-    std::string asString() const;
+    std::string asString(const bool formal = false) const;
 
   public:
     int m;
@@ -31,6 +31,7 @@ class Triple
     Triple rot_by_pi() const;
     bool is_minimal() const;
     std::string asString() const;
+    std::string formal() const;
 
   Rational r1;
   Rational r2;

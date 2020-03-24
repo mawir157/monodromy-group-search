@@ -6,13 +6,17 @@ Rational::Rational(int m, unsigned int n) :
     m(m)
   , n(n) {}
 
-std::string Rational::asString() const
+std::string Rational::asString(const bool formal) const
 {
-  if (m == 0)
+  if ((m == 0) && (formal))
     return "0";
 
   std::string s = std::to_string(m);
-  s.append("/");
+  if (formal)
+    s.append(",");
+  else
+    s.append("/");
+
   s.append(std::to_string(n));
 
   return s;
@@ -131,6 +135,19 @@ std::string Triple::asString() const
   s.append(", ");
   s.append(r3.asString());
   s.append(")");
+
+  return s;
+}
+
+std::string Triple::formal() const
+{
+  std::string s = "";
+  s.append(r1.asString(true));
+  s.append(",");
+  s.append(r2.asString(true));
+  s.append(",");
+  s.append(r3.asString(true));
+  s.append(",");
 
   return s;
 }

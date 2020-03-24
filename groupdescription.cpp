@@ -1,16 +1,13 @@
 #include "groupdescription.h"
 
-GroupDescription::GroupDescription() :
-    M1(arma::eye<CompMat3>(3,3))
-  , M2(arma::eye<CompMat3>(3,3))
-  , M3(arma::eye<CompMat3>(3,3))
+GroupDescription::GroupDescription(std::shared_ptr<const CompMat3> H) :
+    R1(H)
+  , R2(H)
+  , R3(H)
   , R1_ord(-163)
   , R2_ord(-163)
   , R3_ord(-163)
   , R123_ord(-163)
-  , word1("UNSET")
-  , word2("UNSET")
-  , word3("UNSET")
   , braid12(-163)
   , braid23(-163)
   , braid31(-163)
@@ -39,11 +36,11 @@ std::string GroupDescription::print()
   s.append("|");
   s.append(std::to_string(R123_ord));
   s.append(") <");
-  s.append(word1);
+  s.append(R1.as_string());
   s.append(", ");
-  s.append(word2);
+  s.append(R2.as_string());
   s.append(", ");
-  s.append(word3);
+  s.append(R3.as_string());
   s.append(">");
 
   return s;
@@ -85,20 +82,20 @@ void GroupDescription::find_alt(const std::vector<Word>& words,
 
     for (size_t i_1 = 0; i_1 < reduced_words.size(); ++i_1)
     {
-      const Word R1 = reduced_words[i_1];
+      R1 = reduced_words[i_1];
       // make sure R1 has order ref_ord
       if (R1.get_order() != ref_ord)
         continue;
 
       for (size_t i_2 = i_1 + 1; i_2 < reduced_words.size(); ++i_2)
       {
-        const Word R2 = reduced_words[i_2];
+        R2 = reduced_words[i_2];
         // make sure R2 has order ref_ord
         if (R2.get_order() != ref_ord)
           continue;
 
-        M1 = R1.get_matrix();
-        M2 = R2.get_matrix();
+        const CompMat3 M1 = R1.get_matrix();
+        const CompMat3 M2 = R2.get_matrix();
 
         // make sure they are not powers of each other
         if (isPower(M1, M2) || isPower(M2, M1))
@@ -111,12 +108,12 @@ void GroupDescription::find_alt(const std::vector<Word>& words,
 
         for (size_t i_3 = i_2 + 1; i_3 < reduced_words.size(); ++i_3)
         {
-          const Word R3 = reduced_words[i_3];
+          R3 = reduced_words[i_3];
           // make sure R3 has order ref_ord
           if (R3.get_order() != ref_ord)
             continue;
 
-          M3 = R3.get_matrix();
+          const CompMat3 M3 = R3.get_matrix();
           if (isPower(M1, M3) || isPower(M3, M1) ||
               isPower(M3, M2) || isPower(M2, M3))
             continue;
@@ -151,9 +148,9 @@ void GroupDescription::find_alt(const std::vector<Word>& words,
 
           // we've got here, so we have found a group.
           ok = true;
-          word1 = R1.as_string();
-          word2 = R2.as_string();
-          word3 = R3.as_string();
+          // word1 = R1.as_string();
+          // word2 = R2.as_string();
+          // word3 = R3.as_string();
           return;
         }
       }
@@ -183,16 +180,13 @@ std::vector<Word> GroupDescription::remove_non_reflections(const std::vector<Wor
 
 void GroupDescription::reset()
 {
-  M1 = arma::eye<CompMat3>(3,3);
-  M2 = arma::eye<CompMat3>(3,3);
-  M3 = arma::eye<CompMat3>(3,3);
+  R1 = Word(R1.p_H_matrix());
+  R2 = Word(R1.p_H_matrix());
+  R2 = Word(R1.p_H_matrix());
   R1_ord = -163;
   R2_ord = -163;
   R3_ord = -163;
   R123_ord = -163;
-  word1 = "*";
-  word2 = "*";
-  word3 = "*";
   braid12 = -163;
   braid23 = -163;
   braid31 = -163;

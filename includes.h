@@ -28,7 +28,7 @@ static const comp_d omega(-1.0 / 2.0, std::sqrt(3.0) / 2.0);
 static const comp_d c_zero(0.0, 0.0);
 static const double LOWER_TOL = 1e-10;
 static const double TOL = 1e-6;
-static const unsigned int MAX_ORDER = 1000;
-static const unsigned int MAX_BRAID = 1000;
+static const unsigned int MAX_ORDER = 150;
+static const unsigned int MAX_BRAID = 50;
 
-enum RunMode { file, loop, unknown };
+enum RunMode { file, loop, verbose, unknown };

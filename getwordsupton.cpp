@@ -67,25 +67,6 @@ bool get_words_upto_n(const unsigned int n,
     i += 1;
   }
 
-  return true;;
-}
-
-bool CheckWords(const std::vector<Word>& Words,
-                bool& SeenParabolic)
-{
-  SeenParabolic = false;
-  for (size_t i = 0; i< Words.size(); ++i)
-  {
-    Word word_test = Words[i];
-
-    if (word_test.is_non_finite_elliptic())
-      return false;
-
-    if (!SeenParabolic)
-      if ((word_test.get_isom_class() == IsomClass::ParabolicPure) ||
-          (word_test.get_isom_class() == IsomClass::ParabolicScrew))
-        SeenParabolic = true;
-  }
   return true;
 }
 

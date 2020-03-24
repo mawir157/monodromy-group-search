@@ -245,11 +245,7 @@ Word conjugate(const Word& base_word, const Word& conj_word)
 Word Word::operator*(const Word& wd) const
 {
   CompMat3 new_mat = m_matrix * wd.get_matrix();
-  for(auto val : new_mat)
-  {
-    if (std::abs(val) < TOL)
-      val = c_zero;
-  }
+  RemoveNearZeros(new_mat);
 
   IsomClass i_class = GetIsomClass(new_mat, this->get_H_matrix());
 
@@ -261,7 +257,7 @@ Word Word::operator*(const Word& wd) const
   else if (i_class == IsomClass::Identity)
     order = 1;
   else
-    order = Order(new_mat, this->get_H_matrix());
+    order = base_order(new_mat);
 
   comp_d trace = arma::trace(new_mat);
 
