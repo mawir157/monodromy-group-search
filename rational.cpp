@@ -8,7 +8,7 @@ Rational::Rational(int m, unsigned int n) :
 
 std::string Rational::asString(const bool formal) const
 {
-  if ((m == 0) && (formal))
+  if ((m == 0) && (!formal))
     return "0";
 
   std::string s = std::to_string(m);

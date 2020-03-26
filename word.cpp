@@ -2,7 +2,7 @@
 
 Word::Word(std::vector<Generator> gen_vec,
            CompMat3 matrix,
-           std::shared_ptr<const CompMat3> H_matrix,
+           p_CompMat3 H_matrix,
            IsomClass iso_class,
            comp_d trace,
            int order) :
@@ -13,7 +13,7 @@ Word::Word(std::vector<Generator> gen_vec,
   , m_trace(trace)
   , m_order(order) {}
 
-Word::Word(std::shared_ptr<const CompMat3> H_matrix) :
+Word::Word(p_CompMat3 H_matrix) :
     m_gen_vec(0)
   , m_matrix(arma::eye<CompMat3>(3,3))
   , m_H_matrix(H_matrix)
@@ -317,6 +317,11 @@ bool Word::operator>(const Word& wd) const
   }
   // if we get here then the words are equal
   return false;
+}
+
+Point Word::image(const Point p) const
+{
+  return (this->get_matrix()) * p;
 }
 
 void FindIsometryThatFixes(const Point& p,

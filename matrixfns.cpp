@@ -105,39 +105,53 @@ double goldman(const comp_d& t)
   return (a * a * a * a) - (8 * std::real(t * t * t)) + (18 * a * a) - 27;
 }
 
-bool isId(const CompMat3& matrix)
+bool isId(const CompMat3& matrix, const double tol)
 {
   CompMat3 id = arma::eye<CompMat3>(3,3);
-  return areEqual(matrix, id);
+  return areEqual(matrix, id, tol);
 }
 
 
-bool traceEqual(const comp_d& trace_a, const comp_d& trace_b)
+bool traceEqual(const comp_d& trace_a, const comp_d& trace_b, const double tol)
 {
-  if (std::abs(trace_a - trace_b) < TOL)
+  if (std::abs(trace_a - trace_b) < tol)
     return true;
 
-  if (std::abs(trace_a - omega * trace_b) < TOL)
+  if (std::abs(trace_a - omega * trace_b) < tol)
     return true;
 
-  if (std::abs(trace_a - omega * omega * trace_b) < TOL)
+  if (std::abs(trace_a - omega * omega * trace_b) < tol)
     return true;
 
   return false;
 }
 
-bool areEqual(const CompMat3& A, const CompMat3& B)
+bool areEqual(const CompMat3& A, const CompMat3& B, const double tol)
 {
-  if (arma::approx_equal(A, B, "absdiff", TOL))
+  if (arma::approx_equal(A, B, "absdiff", tol))
     return true;
 
-  if (arma::approx_equal(A, omega * B, "absdiff", TOL))
+  if (arma::approx_equal(A, omega * B, "absdiff", tol))
     return true;
 
-  if (arma::approx_equal(A, omega * omega * B, "absdiff", TOL))
+  if (arma::approx_equal(A, omega * omega * B, "absdiff", tol))
     return true;
 
   return false;
+}
+
+
+CompMat3 power(const CompMat3 A, const size_t p)
+{
+  CompMat3 m = arma::eye<CompMat3>(3,3);
+  for (unsigned int i=0; i < p; ++i)
+  {
+    m = m * A;
+    RemoveNearZeros(m);
+    //RemoveNearIntegers(m);
+  }
+
+  return m;
 }
 
 int base_order(const CompMat3& m, const int max_order)
@@ -147,7 +161,10 @@ int base_order(const CompMat3& m, const int max_order)
   for (int i = 2; i < max_order; ++i)
   {
     m_copy = m_copy * m;
-    if (isId(m_copy))
+    RemoveNearZeros(m_copy);
+    //RemoveNearIntegers(m_copy);
+
+    if (isId(m_copy, HIGHER_TOL))
       return i;
   }
 
@@ -377,6 +394,10 @@ bool isPower(const CompMat3& A, const CompMat3& B, const unsigned int upto)
 
     test *= B;
     test_inv *= arma::inv(B);
+    RemoveNearZeros(test);
+    //RemoveNearIntegers(test);
+    RemoveNearZeros(test_inv);
+    //RemoveNearIntegers(test_inv);
   }
   return false;
 }
@@ -634,11 +655,27 @@ void RemoveNearZeros(CompMat3& M, const double tol)
 {
   for(auto& val : M)
   {
-    if (std::abs(val) < LOWER_TOL)
+    if (std::abs(val) < tol)
       val = c_zero;
-    else if (std::abs(std::real(val)) < LOWER_TOL)
+    else if (std::abs(std::real(val)) < tol)
       val = comp_d(0.0, std::imag(val));
-    else if (std::abs(std::imag(val)) < LOWER_TOL)
+    else if (std::abs(std::imag(val)) < tol)
       val = comp_d(std::real(val), 0.0);
+  }
+}
+
+void RemoveNearIntegers(CompMat3& M, const double tol)
+{
+  for(auto& val : M)
+  {
+    double r = std::real(val);
+    double i = std::imag(val);
+    double f_r = std::floor(r);
+    double f_i = std::floor(i);
+
+    double new_r = (r - f_r < tol) ? f_r : r;
+    double new_i = (i - f_i < tol) ? f_i : i;
+
+    val = comp_d(new_r, new_i);
   }
 }

@@ -14,14 +14,6 @@ bool get_words_upto_n(const unsigned int n,
 
   while (i < n)
   {
-    // std::vector<Word> seen_words_n_minus_1;
-    // seen_words_n_minus_1.reserve(1000000);
-    // for (size_t j = 0; j < seen_words.size(); ++j)
-    // {
-    //   const Word test_word = seen_words[j];
-    //   if (test_word.word_length() == i)
-    //     seen_words_n_minus_1.push_back(test_word);
-    // }
     size_t temp = seen_words.size();
     for (size_t j = block_start; j < temp; ++j)
     {
@@ -60,7 +52,6 @@ bool get_words_upto_n(const unsigned int n,
 
         if (!seen)
           seen_words.push_back(new_word);
-
       }
     }
     block_start = temp;

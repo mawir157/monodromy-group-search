@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
       if (!sig.match(2, 0, 1))
         continue;
 
-      std::shared_ptr<const CompMat3> p_H = std::make_shared<const CompMat3>(H);
+      p_CompMat3 p_H = std::make_shared<const CompMat3>(H);
 
       std::vector<CompMat3> mats {A, B};
 
@@ -95,6 +95,23 @@ int main(int argc, char *argv[])
       gd.find_alt(new_Words, 2, groups[i].get_ref_order());
       if (gd.ok)
         std::cout << gd.print() << std::endl;
+
+      Word ell(p_H);
+      // find a regular elliptic word
+      for (size_t i = 0; i < new_Words.size(); ++i)
+      {
+        if (new_Words[i].get_isom_class() == IsomClass::Elliptic)
+        {
+          ell = new_Words[i];
+          break;
+        }
+      }
+      //get that word's fixed point
+      Point p_ell = getEllipticFixedPoint(ell.get_matrix(), ell.get_H_matrix());
+      FunDom fd(p_ell, H);
+      fd.addPoints(new_Words);
+      fd.stochastic_lattice(1000, 100.0, true);
+      fd.stochastic_lattice(100000, 1000.0, true);
 
       // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
 
@@ -153,8 +170,7 @@ int main(int argc, char *argv[])
                 if (!sig.match(2, 0, 1))
                   continue;
 
-                std::shared_ptr<const CompMat3> p_H =
-                                            std::make_shared<const CompMat3>(H);
+                p_CompMat3 p_H = std::make_shared<const CompMat3>(H);
 
                 const Word word_A(v_a, A, p_H, GetIsomClass(A,H),
                                   arma::trace(A), Order(A,H));
@@ -166,20 +182,38 @@ int main(int argc, char *argv[])
 
                 std::vector<Word> gen_Words {word_A, word_Ai, word_B, word_Bi};
                 std::vector<Word> new_Words;
-                bool ok = get_words_upto_n(9, gen_Words, p_H, new_Words, false);
+                bool ok = get_words_upto_n(10, gen_Words, p_H, new_Words, false);
+
+                std::cout << (ok ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
 
                 if (ok)
                 {
                   std::cout << ATriple.asString() << " ";
                   std::cout << BTriple.asString() << std::endl;
-                  std::cout << new_Words.size() << std::endl;
                   summary(new_Words);
                   GroupDescription gd(p_H);
-                  gd.find_alt(new_Words, 2);
+                  gd.find_alt(new_Words, -1);
                   if (gd.ok)
                     std::cout << gd.print() << std::endl;
 
                   std::cout << std::endl;
+
+                  Word ell(p_H);
+                  // find a regular elliptic word
+                  for (size_t i = 0; i < new_Words.size(); ++i)
+                  {
+                    if (new_Words[i].get_isom_class() == IsomClass::Elliptic)
+                    {
+                      ell = new_Words[i];
+                      break;
+                    }
+                  }
+                  //get that word's fixed point
+                  Point p_ell = getEllipticFixedPoint(ell.get_matrix(), ell.get_H_matrix());
+                  FunDom fd(p_ell, H);
+                  fd.addPoints(new_Words);
+                  fd.stochastic_lattice(1000, 100.0, true);
+                  fd.stochastic_lattice(100000, 1000.0, true);
 
                   output_file << ATriple.formal()
                               << BTriple.formal() << "*" << std::endl;
@@ -202,12 +236,24 @@ int main(int argc, char *argv[])
   if (mode == RunMode::verbose)
   {
     bool para = false;
-    std::vector<ParsedLine> groups = parseFile(filepath);
+    size_t index = 65;
 
-    auto [ A, B, H ] = groups[0].toMatrices();
-    std::shared_ptr<const CompMat3> p_H = std::make_shared<const CompMat3>(H);
+//,8,30,9,30,23,30,
 
-    mat_sig sig = get_mat_sig(H);
+    const Triple ATriple(0,30, 1,30, 7,30);
+    const CompMat3 A = TripleToMatrix(ATriple);
+
+    // const Triple BTriple(8,30, 9,30, 23,30);
+    const Triple BTriple(7,30, 9,30, 23,30);
+    const CompMat3 B = TripleToMatrix(BTriple);
+
+    const CompMat3 H = SextupleToH(ATriple, BTriple);
+    const mat_sig sig = get_mat_sig(H);
+    std::cout << sig.asString() << std::endl;
+
+    // auto [ A, B, H ] = groups[index].toMatrices();
+    p_CompMat3 p_H = std::make_shared<const CompMat3>(H);
+
     std::vector<CompMat3> mats {A, B};
 
     std::vector<Generator> v_a {Generator::A};
@@ -221,11 +267,12 @@ int main(int argc, char *argv[])
     std::vector<Word> gen_words {word_A, word_Ai, word_B, word_Bi};
 
     std::vector<Word> new_Words;
-    bool good = get_words_upto_n(12, gen_words, p_H, new_Words);
+    bool good = get_words_upto_n(8, gen_words, p_H, new_Words);
     std::cout << (good ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
 
-    std::cout << groups[0].print() << std::endl;
-    std::cout << new_Words.size() << std::endl;
+    std::cout << ATriple.asString() << ", "
+              << BTriple.asString() << std::endl;
+    summary(new_Words);
 
     GroupDescription gd(p_H);
     gd.find_alt(new_Words, 2, -1);
@@ -240,9 +287,32 @@ int main(int argc, char *argv[])
       std::cout << (gd.R1 * gd.R1 * gd.R1 * gd.R1).get_matrix() << std::endl;
     }
 
+    Word ell(p_H);
+    // find a regular elliptic word
+    for (size_t i = 0; i < new_Words.size(); ++i)
+    {
+      if (new_Words[i].get_isom_class() == IsomClass::Elliptic)
+      {
+        ell = new_Words[i];
+        std::cout << new_Words[i].as_string() << std::endl;
+        break;
+      }
+    }
+    // get that word's fixed point
+    Point p_ell = getEllipticFixedPoint(ell.get_matrix(), ell.get_H_matrix());
+
+    std::vector<double> ds = get_spectrum(p_ell, new_Words);
+
+    for (size_t i = 0; i < ds.size(); ++i)
+    {
+      std::cout << ds[i];
+      if (i % 10 == 9)
+        std::cout << std::endl;
+      else
+        std::cout << ", ";
+    }
 
     // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
-    summary(new_Words);
 
     std::cout << std::endl << std::endl;
   }

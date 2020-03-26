@@ -30,12 +30,13 @@ CompMat3 TripleToMatrix(const Triple A, const bool norm=true);
 CompMat3 SextupleToH(const Triple A, const Triple B, const bool force = true);
 CompMat3 GetU(const Triple A);
 double goldman(const comp_d& t);
-bool isId(const CompMat3& matrix);
-bool areEqual(const CompMat3& A, const CompMat3& B);
-bool traceEqual(const comp_d& trace_a, const comp_d& trace_b);
+bool isId(const CompMat3& matrix, const double tol=TOL);
+bool areEqual(const CompMat3& A, const CompMat3& B, const double tol=TOL);
+bool traceEqual(const comp_d& trace_a, const comp_d& trace_b, const double tol=TOL);
 int base_order(const CompMat3& m, const int max_order = MAX_ORDER);
 int Order(const CompMat3& m, const CompMat3& H,
           const int max_order = MAX_ORDER);
+CompMat3 power(const CompMat3 A, const size_t p);
 CompMat3 conj(const CompMat3 A, const CompMat3 P);
 std::string GetIsomClassStr(const CompMat3& m, const CompMat3& H);
 IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H);
@@ -56,4 +57,5 @@ Point getLineReflectionPolar(const CompMat3& M, const CompMat3& H);
 void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
                         Point& p1, Point& p2);
 
-void RemoveNearZeros(CompMat3& M, const double tol=LOWER_TOL);
+void RemoveNearZeros(CompMat3& M, const double tol=TOL);
+void RemoveNearIntegers(CompMat3& M, const double tol=TOL);

@@ -43,7 +43,7 @@ class Word
     std::string str_isom_class() const;
     CompMat3 get_matrix() const { return m_matrix; }
     const CompMat3 get_H_matrix() const { return *(m_H_matrix.get()); }
-    std::shared_ptr<const CompMat3> p_H_matrix() const { return m_H_matrix; }
+    p_CompMat3 p_H_matrix() const { return m_H_matrix; }
     comp_d get_trace() const { return m_trace; }
     std::vector<Generator> get_gen_vec() const { return m_gen_vec; }
     bool is_non_finite_elliptic() const;
@@ -53,13 +53,16 @@ class Word
     bool operator<(const Word& wd) const;
     bool operator>(const Word& wd) const;
 
+    // image of point
+    Point image(const Point p) const;
+
   private:
-    CompMat3                        m_matrix;
-    std::shared_ptr<const CompMat3> m_H_matrix;
-    std::vector<Generator>          m_gen_vec;
-    IsomClass                       m_iso_class;
-    comp_d                          m_trace;
-    int                             m_order;
+    CompMat3               m_matrix;
+    p_CompMat3             m_H_matrix;
+    std::vector<Generator> m_gen_vec;
+    IsomClass              m_iso_class;
+    comp_d                 m_trace;
+    int                    m_order;
 };
 
 Word conjugate(const Word& base_word, const Word& conj_word);

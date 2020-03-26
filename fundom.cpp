@@ -3,78 +3,127 @@
 #include "matrixfns.h"
 
 FunDom::FunDom(const Point& p, const CompMat3& H) :
-    base(p)
-  , H(H) {}
+    m_base(p)
+  , m_H(H) {}
 
-void FunDom::addPoint(CompMat3& M)
+
+void FunDom::addPoints(const std::vector<Word>& wds)
 {
-  Point image = M * base;
-  if (arma::norm(image - base) < TOL)
+  for (size_t i = 0; i <  wds.size(); ++i)
+    this->addPoint(wds[i].get_matrix());
+}
+
+void FunDom::addPoint(const CompMat3& M)
+{
+  Point image = M * m_base;
+  if (arma::norm(image - m_base) < TOL)
       return;
-  for (size_t i = 0; i < images.size(); ++i)
+  for (size_t i = 0; i < m_images.size(); ++i)
   {
     // is already seem
-    if (arma::norm(image - images[i]) < TOL)
+    if (arma::norm(image - m_images[i]) < TOL)
       return;
   }
-  images.push_back(image);
+  m_images.push_back(image);
 }
 
 void FunDom::print() const
 {
-  for (size_t i = 0; i < images.size(); ++i)
+  for (size_t i = 0; i < m_images.size(); ++i)
   {
-    if (isnan(comp_distance(images[i], base, H)))
+    if (isnan(comp_distance(m_images[i], m_base, m_H)))
     {
       std::cout << "**********************************************" << std::endl;
-      std::cout << images[i] << std::endl;
-      std::cout << base <<std::endl;
-      const comp_d t = (herm(images[i], base, H) * herm(base, images[i], H)) /
-                   (herm(images[i], images[i], H) * herm(base, base, H));
+      std::cout << m_images[i] << std::endl;
+      std::cout << m_base <<std::endl;
+      const comp_d t = (herm(m_images[i], m_base, m_H) * herm(m_base, m_images[i], m_H)) /
+                       (herm(m_images[i], m_images[i], m_H) * herm(m_base, m_base, m_H));
       std::cout << "<><> / <><> = " << std::real(t) << std::endl;
       std::cout << "sqrt(<><>/<><>)" << std::sqrt(std::real(t)) << std::endl;
     }
-    std::cout << comp_distance(images[i], base, H) << std::endl;
+    std::cout << comp_distance(m_images[i], m_base, m_H) << std::endl;
   }
 }
 
-bool FunDom::stochastic_lattice(unsigned int n, bool verbose)
+bool FunDom::stochastic_lattice(const unsigned int n,
+                                const double width,
+                                const bool verbose)
 {
   // step 1 generate n random negative vectors
-  std::vector<Point> null_vectors;
+  std::vector<Point> neg_vectors;
 
-  double lower_bound = -10;
-  double upper_bound = 10;
+  double lower_bound = -width;
+  double upper_bound = width;
   std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  while (null_vectors.size() < n)
+  while (neg_vectors.size() < n)
   {
     Point p(3);
-    p << base[0] + comp_d(unif(gen), unif(gen)) << arma::endr
-      << base[1] + comp_d(unif(gen), unif(gen)) << arma::endr
-      << base[2] + comp_d(unif(gen), unif(gen)) << arma::endr;
+    p << m_base[0] + comp_d(unif(gen), unif(gen)) << arma::endr
+      << m_base[1] + comp_d(unif(gen), unif(gen)) << arma::endr
+      << m_base[2] + comp_d(unif(gen), unif(gen)) << arma::endr;
 
-    if (std::real(herm(p, p, H)) < 0)
-      null_vectors.push_back(p);
+    if (std::real(herm(p, p, m_H)) < 0)
+      neg_vectors.push_back(p);
   }
 
   // now see how many of these points lie outside the dirichlet domain
-  unsigned int c = 0;
-  for (unsigned int i = 0; i < null_vectors.size(); ++i)
+  std::cout << "generated " << n << " negative vectors" << std::endl;
+
+  std::vector<double> inside_distances;
+  inside_distances.reserve(neg_vectors.size());
+  for (unsigned int i = 0; i < neg_vectors.size(); ++i)
   {
-    Point p = null_vectors[i];
-    for (unsigned int j = 0; j < images.size(); ++j)
+    Point p = neg_vectors[i];
+    bool ok = true;
+    const double d = comp_distance(m_base, p, m_H);
+    for (unsigned int j = 0; j < m_images.size(); ++j)
     {
-      if (comp_distance(base, p, H) > comp_distance(images[j], p, H))
+      if (d > comp_distance(m_images[j], p, m_H))
       {
-        ++c;
+        ok = false;
         break;
       }
     }
+    if (ok)
+      inside_distances.push_back(d);
   }
+  std::sort(inside_distances.begin(), inside_distances.end());
+
   if (verbose)
-    std::cout << " | " << c  << "~" << null_vectors.size() << std::endl;
+  {
+    std::cout << " | " << inside_distances.size() << "~" << neg_vectors.size() << std::endl;
+    std::cout << " | " << inside_distances.back() << std::endl;
+  }
   return true;
+}
+
+std::vector<double> get_spectrum(const Point& p,
+                                 const std::vector<Word>& words)
+{
+  std::vector<double> distances;
+  distances.reserve(words.size());
+  for (size_t i = 0; i <  words.size(); ++i)
+  {
+    const Word wd = words[i];
+    const Point wd_p = wd.image(p);
+
+    const double d = comp_distance(p, wd_p, wd.get_H_matrix());
+    distances.push_back(d);
+  }
+
+  std::sort(distances.begin(), distances.end());
+
+  std::vector<double> reduced_deistances;
+  reduced_deistances.push_back(distances[0]);
+
+  for (size_t i = 1; i < distances.size(); ++i)
+  {
+    if (std::abs(distances[i] - reduced_deistances.back()) > TOL)
+      reduced_deistances.push_back(distances[i]);
+  }
+
+  return reduced_deistances;
 }
