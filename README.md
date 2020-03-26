@@ -28,6 +28,6 @@ sudo make install
 
 ## Usage
 
-`mono - f input/groups.txt`
+`mono -f input/groups.txt`
 
-`mono - l 5 5`
+`mono -l 5 5`
