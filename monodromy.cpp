@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 
                 std::vector<Word> gen_Words {word_A, word_Ai, word_B, word_Bi};
                 std::vector<Word> new_Words;
-                bool ok = get_words_upto_n(9, gen_Words, p_H, new_Words, false);
+                bool ok = get_words_upto_n(10, gen_Words, p_H, new_Words, false);
 
                 std::cout << (ok ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
 
@@ -206,12 +206,14 @@ int main(int argc, char *argv[])
                     std::cout << "Cannot find a triangle group presentation"
                               << std::endl;
 
+                  unsigned int lattice_count = 0;
                   for (size_t i = 0; i < 5; ++i)
                   {
                     Point base_point = find_neg(H);
                     FunDom fd(base_point, H);
                     fd.addPoints(new_Words);
-                    fd.stochastic_lattice(10000, 100.0, true);
+                    if (fd.stochastic_lattice(10000, 100.0, true) < 100)
+                      ++lattice_count;
                   }
 
                   output_file << ATriple.formal()
@@ -221,6 +223,12 @@ int main(int argc, char *argv[])
                     output_file << "!";
                     output_file << gd.print() << std::endl;
                   }
+
+
+                  if (lattice_count > 0)
+                    output_file << "!" << "Lattice count = "
+                                << lattice_count << std::endl;
+
                   std::cout << std::endl << std::endl;
                 }
               }
@@ -229,6 +237,7 @@ int main(int argc, char *argv[])
         }
       }
     }
+    output_file << "!" << "Loop finished without error" << std::endl;
 
     output_file.close();
   }
