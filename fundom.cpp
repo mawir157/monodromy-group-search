@@ -51,6 +51,7 @@ bool FunDom::stochastic_lattice(const unsigned int n,
 {
   // step 1 generate n random negative vectors
   std::vector<Point> neg_vectors;
+  neg_vectors.push_back(m_base);
 
   double lower_bound = -width;
   double upper_bound = width;

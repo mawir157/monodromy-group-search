@@ -51,7 +51,7 @@ comp_d crossprod(const Point& z1, const Point& z2,
                  const Point& w1, const Point& w2, const CompMat3& H);
 double Ma(const CompMat3& A);
 double comp_distance(const Point& p1, const Point& p2, const CompMat3& H);
-Point find_null(const CompMat3& H);
+Point find_neg(const CompMat3& H);
 Point getEllipticFixedPoint(const CompMat3& M, const CompMat3& H);
 Point getLineReflectionPolar(const CompMat3& M, const CompMat3& H);
 void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,

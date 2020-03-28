@@ -12,6 +12,16 @@
 #include "word.h"
 
 #include <stdlib.h>
+#include <unistd.h> // used for cli options
+
+/*
+  -f read input from file
+  -l max word length, default 10
+  -a search a denom
+  -b search b denom
+  -v verbose mode - for debugging 
+*/
+
 
 int main(int argc, char *argv[])
 {
@@ -96,22 +106,13 @@ int main(int argc, char *argv[])
       if (gd.ok)
         std::cout << gd.print() << std::endl;
 
-      Word ell(p_H);
-      // find a regular elliptic word
-      for (size_t i = 0; i < new_Words.size(); ++i)
+      for (size_t i = 0; i < 5; ++i)
       {
-        if (new_Words[i].get_isom_class() == IsomClass::Elliptic)
-        {
-          ell = new_Words[i];
-          break;
-        }
+        Point base_point = find_neg(H);
+        FunDom fd(base_point, H);
+        fd.addPoints(new_Words);
+        fd.stochastic_lattice(10000, 100.0, true);
       }
-      //get that word's fixed point
-      Point p_ell = getEllipticFixedPoint(ell.get_matrix(), ell.get_H_matrix());
-      FunDom fd(p_ell, H);
-      fd.addPoints(new_Words);
-      fd.stochastic_lattice(1000, 100.0, true);
-      fd.stochastic_lattice(100000, 1000.0, true);
 
       // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
 
@@ -182,7 +183,7 @@ int main(int argc, char *argv[])
 
                 std::vector<Word> gen_Words {word_A, word_Ai, word_B, word_Bi};
                 std::vector<Word> new_Words;
-                bool ok = get_words_upto_n(10, gen_Words, p_H, new_Words, false);
+                bool ok = get_words_upto_n(8, gen_Words, p_H, new_Words, false);
 
                 std::cout << (ok ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
 
@@ -192,28 +193,20 @@ int main(int argc, char *argv[])
                   std::cout << BTriple.asString() << std::endl;
                   summary(new_Words);
                   GroupDescription gd(p_H);
-                  gd.find_alt(new_Words, -1);
+                  gd.find_alt(new_Words, 2, -1);
                   if (gd.ok)
                     std::cout << gd.print() << std::endl;
+                  else
+                    std::cout << "Cannot find a triangle group presentation"
+                              << std::endl;
 
-                  std::cout << std::endl;
-
-                  Word ell(p_H);
-                  // find a regular elliptic word
-                  for (size_t i = 0; i < new_Words.size(); ++i)
+                  for (size_t i = 0; i < 5; ++i)
                   {
-                    if (new_Words[i].get_isom_class() == IsomClass::Elliptic)
-                    {
-                      ell = new_Words[i];
-                      break;
-                    }
+                    Point base_point = find_neg(H);
+                    FunDom fd(base_point, H);
+                    fd.addPoints(new_Words);
+                    fd.stochastic_lattice(10000, 100.0, true);
                   }
-                  //get that word's fixed point
-                  Point p_ell = getEllipticFixedPoint(ell.get_matrix(), ell.get_H_matrix());
-                  FunDom fd(p_ell, H);
-                  fd.addPoints(new_Words);
-                  fd.stochastic_lattice(1000, 100.0, true);
-                  fd.stochastic_lattice(100000, 1000.0, true);
 
                   output_file << ATriple.formal()
                               << BTriple.formal() << "*" << std::endl;
@@ -222,6 +215,7 @@ int main(int argc, char *argv[])
                     output_file << "!";
                     output_file << gd.print() << std::endl;
                   }
+                  std::cout << std::endl << std::endl;
                 }
               }
             }
@@ -239,12 +233,12 @@ int main(int argc, char *argv[])
     size_t index = 65;
 
 //,8,30,9,30,23,30,
-
-    const Triple ATriple(0,30, 1,30, 7,30);
+// (0, 1/10, 5/10) (3/10, 4/10, 8/10)
+    const Triple ATriple(0,10, 1,10, 5,10);
     const CompMat3 A = TripleToMatrix(ATriple);
 
     // const Triple BTriple(8,30, 9,30, 23,30);
-    const Triple BTriple(7,30, 9,30, 23,30);
+    const Triple BTriple(3,10, 4,10, 8,10);
     const CompMat3 B = TripleToMatrix(BTriple);
 
     const CompMat3 H = SextupleToH(ATriple, BTriple);
@@ -267,7 +261,7 @@ int main(int argc, char *argv[])
     std::vector<Word> gen_words {word_A, word_Ai, word_B, word_Bi};
 
     std::vector<Word> new_Words;
-    bool good = get_words_upto_n(8, gen_words, p_H, new_Words);
+    bool good = get_words_upto_n(10, gen_words, p_H, new_Words);
     std::cout << (good ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
 
     std::cout << ATriple.asString() << ", "
@@ -276,6 +270,7 @@ int main(int argc, char *argv[])
 
     GroupDescription gd(p_H);
     gd.find_alt(new_Words, 2, -1);
+    std::cout << gd.print() << std::endl;
     if (gd.ok)
     {
       std::cout << gd.print() << std::endl;

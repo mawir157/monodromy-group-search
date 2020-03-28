@@ -501,7 +501,7 @@ double comp_distance(const Point& p1, const Point& p2, const CompMat3& H)
   return 2.0 * std::acosh(std::sqrt(std::real(t)));
 }
 
-Point find_null(const CompMat3& H)
+Point find_neg(const CompMat3& H)
 {
   double lower_bound = -100;
   double upper_bound = 100;
