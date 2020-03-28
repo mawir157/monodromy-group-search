@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
   unsigned int a1_1, a1_2, a2_1, a2_2, a3_1, a3_2;
   unsigned int b1_1, b1_2, b2_1, b2_2, b3_1, b3_2;
 
+  std::string filelabel = "";
+
   if (argc < 1)
   {
     std::cout << "invalid options" << std::endl;
@@ -55,6 +57,11 @@ int main(int argc, char *argv[])
       std::cout << "searching all groups with of the form "
                 << "*/" << denom_a << ", "
                 << "*/" << denom_b << std::endl;
+      filelabel.append("[");
+      filelabel.append(argv[2]);
+      filelabel.append("-");
+      filelabel.append(argv[3]);
+      filelabel.append("]");
     }
     else if (std::strcmp(argv[1], "-v") == 0)
     {
@@ -111,7 +118,7 @@ int main(int argc, char *argv[])
         Point base_point = find_neg(H);
         FunDom fd(base_point, H);
         fd.addPoints(new_Words);
-        fd.stochastic_lattice(10000, 100.0, true);
+        fd.stochastic_lattice(100000, 100.0, true);
       }
 
       // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
@@ -122,11 +129,10 @@ int main(int argc, char *argv[])
 
   if (mode == RunMode::loop)
   {
-
     const std::vector<Generator> v_a {Generator::A};
     const std::vector<Generator> v_b {Generator::B};
 
-    const std::string file_path = GenerateFileName();
+    const std::string file_path = GenerateFileName("output", filelabel);
     std::ofstream output_file;
     output_file.open(file_path);
     std::cout << "Saving to " << file_path << std::endl;
@@ -183,7 +189,7 @@ int main(int argc, char *argv[])
 
                 std::vector<Word> gen_Words {word_A, word_Ai, word_B, word_Bi};
                 std::vector<Word> new_Words;
-                bool ok = get_words_upto_n(8, gen_Words, p_H, new_Words, false);
+                bool ok = get_words_upto_n(9, gen_Words, p_H, new_Words, false);
 
                 std::cout << (ok ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
 
