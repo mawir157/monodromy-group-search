@@ -169,7 +169,7 @@ std::string GenerateFileName(const std::string directory,
   filename.append(buffer);
 
   if (label.length() > 0)
-		filename.append(buffer);
+		filename.append(label);
 
   filename.append(".txt");
 
