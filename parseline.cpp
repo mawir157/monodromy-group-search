@@ -176,32 +176,32 @@ std::string GenerateFileName(const std::string directory,
   return filename;
 }
 
+comp_d parseComplex(const std::string cString)
+{
+  //real[+/-]Iimag
+  int from = 0;
+  int pm = cString.find_first_of ("+-", from + 1);
+  char c = cString.at(pm);
+  const double r1 = std::stod(cString.substr(from, pm - from));
+  from = pm + 2;
+  const double i1 = std::stod(cString.substr(from, 100));
+  const comp_d m(r1, (c == '+') ? i1 : (-1 * i1));
+
+  return m;
+}
+
 std::tuple<comp_d, comp_d, comp_d> parseMatrixRow(const std::string row)
 {
   int from = 0;
-  int pm = row.find_first_of ("+-", from + 1);
-  const double r1 = std::stod(row.substr(from, pm - from));
-  from = pm + 2;
   int comma = row.find (",", from);
-  const double i1 = std::stod(row.substr(from, comma - from));
-  const comp_d m1(r1, i1);
-  from = comma + 1;
+  const comp_d m1 = parseComplex(row.substr(from, comma - from));
 
-  pm = row.find_first_of ("+-", from + 1);
-  const double r2 = std::stod(row.substr(from, pm - from));
-  from = pm + 2;
-  comma = row.find (",", from);
-  const double i2 = std::stod(row.substr(from, comma - from));
-  const comp_d m2(r2, i2);
   from = comma + 1;
+  comma = row.find (",", from);
+  const comp_d m2 = parseComplex(row.substr(from, comma - from));
 
-  pm = row.find_first_of ("+-", from + 1);
-  const double r3 = std::stod(row.substr(from, pm - from));
-  from = pm + 2;
-  comma = row.find (",", from);
-  const double i3 = std::stod(row.substr(from, comma - from));
-  const comp_d m3(r3, i3);
   from = comma + 1;
+  const comp_d m3 = parseComplex(row.substr(from, 100));
 
   std::tuple<comp_d, comp_d, comp_d> three(m1, m2, m3);
 

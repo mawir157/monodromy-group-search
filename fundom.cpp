@@ -132,7 +132,8 @@ void FunDom::move_point(Point& p, const bool verbose)
   const double dist = comp_distance(p, m_base, m_H);
 if (verbose) {std::cout << "]--> " << dist << std::endl;}
 
-  while (true)
+  // while (true)
+  for (size_t i = 0; i < 50; ++i)
   {
     Point new_p(3);
     new_p << p[0] + comp_d(unif(gen), unif(gen)) << arma::endr
