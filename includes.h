@@ -33,4 +33,4 @@ static const double HIGHER_TOL = 1e-3;
 static const unsigned int MAX_ORDER = 150;
 static const unsigned int MAX_BRAID = 50;
 
-enum RunMode { file, loop, verbose, unknown };
+enum RunMode { file, loop, verbose, matrix, unknown };

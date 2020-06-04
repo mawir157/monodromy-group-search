@@ -69,6 +69,12 @@ int main(int argc, char *argv[])
       mode = RunMode::verbose;
       filepath = argv[2];
     }
+    else if (std::strcmp(argv[1], "-m") == 0)
+    {
+      std::cout << "m" << std::endl;
+      mode = RunMode::matrix;
+      filepath = argv[2];
+    }
     else
     {
       std::cout << "unrecognised options" << std::endl;
@@ -113,12 +119,12 @@ int main(int argc, char *argv[])
       if (gd.ok)
         std::cout << gd.print() << std::endl;
 
-      for (size_t i = 0; i < 5; ++i)
+      for (size_t i = 0; i < 10; ++i)
       {
         Point base_point = find_neg(H);
         FunDom fd(base_point, H);
         fd.addPoints(new_Words);
-        fd.stochastic_lattice(100000, 100.0, true);
+        fd.stochastic_lattice(10000, 100.0, true);
       }
 
       // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
@@ -240,6 +246,17 @@ int main(int argc, char *argv[])
     output_file << "!" << "Loop finished without error" << std::endl;
 
     output_file.close();
+  }
+
+  if (mode == RunMode::matrix)
+  {
+    auto [ H, mats] = parseMatrixFile(filepath);
+    std::cout << H << std::endl;
+
+    for (size_t i = 0; i <  mats.size(); ++i)
+    {
+      std::cout << mats[i] << std::endl;
+    }
   }
 
   if (mode == RunMode::verbose)

@@ -73,19 +73,23 @@ unsigned int FunDom::stochastic_lattice(const unsigned int n,
 
   std::vector<double> inside_distances;
   inside_distances.reserve(neg_vectors.size());
+  double max_dist = 0;
   for (unsigned int i = 0; i < neg_vectors.size(); ++i)
   {
     Point p = neg_vectors[i];
     const double d = comp_distance(m_base, p, m_H);
     if (this->is_in_Dirichlet(p))
       inside_distances.push_back(d);
+    if (d > max_dist)
+      max_dist = d;
   }
   std::sort(inside_distances.begin(), inside_distances.end());
 
   if (verbose)
   {
     std::cout << " | " << inside_distances.size() << "~" << neg_vectors.size() << std::endl;
-    std::cout << " | " << inside_distances.back() << std::endl;
+    std::cout << " | " << 1.0 * inside_distances.size() / neg_vectors.size()  << std::endl;
+    std::cout << " | " << inside_distances.back() << " (" << max_dist << ")" << std::endl;
   }
   return inside_distances.size();
 }

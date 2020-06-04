@@ -175,3 +175,106 @@ std::string GenerateFileName(const std::string directory,
 
   return filename;
 }
+
+std::tuple<comp_d, comp_d, comp_d> parseMatrixRow(const std::string row)
+{
+  int from = 0;
+  int pm = row.find_first_of ("+-", from + 1);
+  const double r1 = std::stod(row.substr(from, pm - from));
+  from = pm + 2;
+  int comma = row.find (",", from);
+  const double i1 = std::stod(row.substr(from, comma - from));
+  const comp_d m1(r1, i1);
+  from = comma + 1;
+
+  pm = row.find_first_of ("+-", from + 1);
+  const double r2 = std::stod(row.substr(from, pm - from));
+  from = pm + 2;
+  comma = row.find (",", from);
+  const double i2 = std::stod(row.substr(from, comma - from));
+  const comp_d m2(r2, i2);
+  from = comma + 1;
+
+  pm = row.find_first_of ("+-", from + 1);
+  const double r3 = std::stod(row.substr(from, pm - from));
+  from = pm + 2;
+  comma = row.find (",", from);
+  const double i3 = std::stod(row.substr(from, comma - from));
+  const comp_d m3(r3, i3);
+  from = comma + 1;
+
+  std::tuple<comp_d, comp_d, comp_d> three(m1, m2, m3);
+
+  return three;
+}
+
+CompMat3 parseMatrix(std::ifstream& dataStream)
+{
+  std::string line;
+  getline(dataStream, line);
+  // line should be of the form STRING = \n
+  // we don't do anything with this line
+
+  getline(dataStream, line);
+  // line should be of the form "[[123+123,123+123,123+123],""
+  auto [ i11, i12, i13 ] = parseMatrixRow(line.substr(2, line.size() - 4));
+
+  getline(dataStream, line);
+  // line should be of the form " [123+123,123+123,123+123],""
+  auto [ i21, i22, i23 ] = parseMatrixRow(line.substr(2, line.size() - 4));
+
+  getline(dataStream, line);
+  // line should be of the form " [123+123,123+123,123+123]]"
+  auto [ i31, i32, i33 ] = parseMatrixRow(line.substr(2, line.size() - 4));
+
+  CompMat3 mat(3, 3);
+  mat << i11 << i12 << i13 << arma::endr
+      << i21 << i22 << i23 << arma::endr
+      << i31 << i32 << i33 << arma::endr;
+
+  return mat;
+}
+
+/*
+H =
+[[123+i123,123+i123,123+i123],
+ [123+i123,123+i123,123+i123],
+ [123+i123,123+i123,123+i123]]
+
+R1 =
+[[123+I123,123+I123,123+I123],
+ [123+I123,123+I123,123+I123],
+ [123+I123,123+I123,123+I123]]
+
+R2 =
+[[123+I123,123+I123,123+I123],
+ [123+I123,123+I123,123+I123],
+ [123+I123,123+I123,123+I123]]
+
+R3 =
+[[123+I123,123+I123,123+I123],
+ [123+I123,123+I123,123+I123],
+ [123+I123,123+I123,123+I123]]
+*/
+
+// returns (H, [R1, R2, R3])
+std::tuple<CompMat3, std::vector<CompMat3>>  parseMatrixFile(const std::string filename,
+                                                             const bool verbose)
+{
+  std::ifstream data_file(filename);
+
+  const CompMat3 H = parseMatrix(data_file);
+
+  std::vector<CompMat3> gens;
+
+  std::string line; // not used
+  while (getline(data_file, line))
+  {
+    CompMat3 temp = parseMatrix(data_file);
+    gens.push_back(temp);
+  }
+
+  std::tuple<CompMat3, std::vector<CompMat3>> group(H, gens);
+
+  return group;
+}

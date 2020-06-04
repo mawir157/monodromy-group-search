@@ -40,3 +40,10 @@ std::vector<ParsedLine> parseFile(const std::string filename,
 
 std::string GenerateFileName(const std::string directory = "output",
 														 const std::string label = "");
+
+std::tuple<comp_d, comp_d, comp_d> parseMatrixRow(const std::string row);
+
+CompMat3 parseMatrix(std::ifstream& dataStream);
+
+std::tuple<CompMat3, std::vector<CompMat3>>  parseMatrixFile(const std::string filename,
+	                                                           const bool verbose = false);
