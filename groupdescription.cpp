@@ -46,16 +46,18 @@ std::string GroupDescription::print()
   return s;
 }
 
-void GroupDescription::find_alt(const std::vector<Word>& words,
-                                const int min_braid,
-                                const int reflection_order)
+std::vector<Word> GroupDescription::find_alt(const std::vector<Word>& words,
+                                             const int min_braid,
+                                             const int reflection_order)
 {
+  std::vector<Word> triangle;
+
   reset();
   std::vector<Word> reduced_words = remove_non_reflections(words);
   if (reduced_words.size() == 0)
   {
     std::cout << "No reflections found" << std::endl;
-    return;
+    return triangle;
   }
 
   const CompMat3 H = reduced_words[0].get_H_matrix();
@@ -151,7 +153,14 @@ void GroupDescription::find_alt(const std::vector<Word>& words,
           // word1 = R1.as_string();
           // word2 = R2.as_string();
           // word3 = R3.as_string();
-          return;
+          Word R1a = R1;
+          R1a.overwrite_gen_vec({Generator::R1});
+          Word R2a = R2;
+          R2a.overwrite_gen_vec({Generator::R2});
+          Word R3a = R3;
+          R3a.overwrite_gen_vec({Generator::R3});
+          triangle = {R1a, R2a, R3a};
+          return triangle;
         }
       }
     }
@@ -159,7 +168,7 @@ void GroupDescription::find_alt(const std::vector<Word>& words,
   // if we've got here, we have failed to find a group presentation
   // so reset and bail out
   reset();
-  return;
+  return triangle;
 }
 
 std::vector<Word> GroupDescription::remove_non_reflections(const std::vector<Word>& words,

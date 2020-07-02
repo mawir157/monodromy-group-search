@@ -21,9 +21,9 @@ class GroupDescription
     int braid3212;
     bool ok;
 
-    void find_alt(const std::vector<Word>& words,
-                  const int min_braid,
-                  const int reflection_order = -1);
+    std::vector<Word> find_alt(const std::vector<Word>& words,
+                               const int min_braid,
+                               const int reflection_order = -1);
     void reset();
     std::string print();
   private:

@@ -115,9 +115,27 @@ int main(int argc, char *argv[])
       summary(new_Words);
 
       GroupDescription gd(p_H);
-      gd.find_alt(new_Words, 2, groups[i].get_ref_order());
+      std::vector<Word> tg = gd.find_alt(new_Words, 2,
+                                         groups[i].get_ref_order());
+      
+      std::cout << tg.size() << std::endl;
+
       if (gd.ok)
+      {
         std::cout << gd.print() << std::endl;
+        std::cout << "*  *  *  *  *  *  *  *  *  *  *  *  *  *" <<std::endl;
+        gd.find_alt(tg, 2, tg[0].get_order());
+        std::cout << gd.print() << std::endl;
+
+        get_words_upto_n(8, tg, p_H, new_Words);
+        summary(new_Words);
+        FunDom fd(new_Words, H);
+        const std::vector<Word> fd_words = fd.get_vertices(true);
+      }
+      else
+      {
+        std::cout << "FAILED TO FIND TRIANGLE GROUP DESCRIPTION" << std::endl;
+      }
 
       // for (size_t i = 0; i < 10; ++i)
       // {
@@ -127,11 +145,8 @@ int main(int argc, char *argv[])
       //   fd.stochastic_lattice(10000, 100.0, true);
       // }
 
-      FunDom fd(new_Words, H);
-      const std::vector<Word> fd_words = fd.get_vertices(true);
-
       // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
-
+      std::cout << "******************************************" <<std::endl;
       std::cout << std::endl << std::endl;
     }
   }

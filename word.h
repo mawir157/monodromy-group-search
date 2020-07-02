@@ -33,6 +33,7 @@ class Word
     size_t word_length() const { return m_gen_vec.size(); }
     Word invert() const;
     void simplify_gen_vec();
+    void overwrite_gen_vec(const std::vector<Generator>& v) { m_gen_vec = v;}
 
     // inplace conjugation
     void conjugate(const Word& P);
