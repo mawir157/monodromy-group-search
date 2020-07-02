@@ -249,25 +249,25 @@ IsomClass GetIsomClass(const CompMat3& m, const CompMat3& H)
   if (isId(m))
     return IsomClass::Identity;
 
-  comp_d tr = arma::trace(m);
+  const comp_d tr = RoundComplex(arma::trace(m));
 
   if ((std::abs(tr - 3.0) < TOL) ||
       (std::abs(tr - 3.0 * omega) < TOL) ||
       (std::abs(tr - 3.0 * omega * omega) < TOL))
     return IsomClass::ParabolicPure;
 
-  double gman = goldman(tr);
+  const double gman = goldman(tr);
 
-  if (gman > LOWER_TOL)
+  if (gman > TOL)
     return IsomClass::Loxodromic;
 
-  if (gman < -LOWER_TOL)
+  if (gman < -TOL)
     return IsomClass::Elliptic;
 
   // gman is "0" we're either screw parabolic or a complex reflection
   // the trace lies on the smooth part of the deltoid
   // this means the e-vals are A A B
-  if (std::abs(gman) < LOWER_TOL)
+  if (std::abs(gman) < TOL)
   {
     arma::cx_vec eigval;
     arma::cx_mat eigvec;
@@ -554,7 +554,8 @@ Point getEllipticFixedPoint(const CompMat3& M, const CompMat3& H)
                      (r3 < TOL ? 1 : 0);
 
   if ((pos != 2) || (neg != 1))
-    std::cout << "IT'S ALL GONE WRONG!" << std::endl;
+    std::cout << "IT'S ALL GONE WRONG! (" 
+              << r1 << "," << r2 << "," << r3 << ")" << std::endl;
 
   const size_t neg_index = (r1 < TOL ? 0 : (r2 < TOL ? 1 : 2));
 
@@ -651,6 +652,21 @@ void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
   return;
 }
 
+comp_d RoundComplex(const comp_d z, const double tol)
+{
+  const double r = std::real(z);
+  const double i = std::imag(z);
+  const double f_r = std::floor(r);
+  const double f_i = std::floor(i);
+
+  const double new_r = (r - f_r < tol) ? f_r : r;
+  const double new_i = (i - f_i < tol) ? f_i : i;
+
+  const comp_d w = comp_d(new_r, new_i);
+
+  return w;
+}
+
 void RemoveNearZeros(CompMat3& M, const double tol)
 {
   for(auto& val : M)
@@ -668,14 +684,6 @@ void RemoveNearIntegers(CompMat3& M, const double tol)
 {
   for(auto& val : M)
   {
-    double r = std::real(val);
-    double i = std::imag(val);
-    double f_r = std::floor(r);
-    double f_i = std::floor(i);
-
-    double new_r = (r - f_r < tol) ? f_r : r;
-    double new_i = (i - f_i < tol) ? f_i : i;
-
-    val = comp_d(new_r, new_i);
+    val = RoundComplex(val, tol);
   }
 }

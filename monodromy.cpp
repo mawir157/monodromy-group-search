@@ -119,13 +119,16 @@ int main(int argc, char *argv[])
       if (gd.ok)
         std::cout << gd.print() << std::endl;
 
-      for (size_t i = 0; i < 10; ++i)
-      {
-        Point base_point = find_neg(H);
-        FunDom fd(base_point, H);
-        fd.addPoints(new_Words);
-        fd.stochastic_lattice(10000, 100.0, true);
-      }
+      // for (size_t i = 0; i < 10; ++i)
+      // {
+      //   Point base_point = find_neg(H);
+      //   StochFunDom fd(base_point, H);
+      //   fd.addPoints(new_Words);
+      //   fd.stochastic_lattice(10000, 100.0, true);
+      // }
+
+      FunDom fd(new_Words, H);
+      const std::vector<Word> fd_words = fd.get_vertices(true);
 
       // std::cout << (jorgensen(new_Words) ? "*PASSED*" : "*FAILED*") << std::endl;
 
@@ -216,7 +219,7 @@ int main(int argc, char *argv[])
                   for (size_t i = 0; i < 5; ++i)
                   {
                     Point base_point = find_neg(H);
-                    FunDom fd(base_point, H);
+                    StochFunDom fd(base_point, H);
                     fd.addPoints(new_Words);
                     if (fd.stochastic_lattice(10000, 100.0, true) < 100)
                       ++lattice_count;
@@ -276,7 +279,7 @@ int main(int argc, char *argv[])
     std::cout << sig.asString() << std::endl;
 
     std::vector<Word> new_Words;
-    bool good = get_words_upto_n(11, gen_words, p_H, new_Words);
+    bool good = get_words_upto_n(15, gen_words, p_H, new_Words);
     std::cout << (good ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
     summary(new_Words);
 
@@ -284,14 +287,17 @@ int main(int argc, char *argv[])
     gd.find_alt(new_Words, 2);
     std::cout << gd.print() << std::endl;
 
-    for (size_t i = 0; i < 10; ++i)
-    {
-      Point base_point = find_neg(H);
-      FunDom fd(base_point, H);
-      fd.addPoints(new_Words);
-      fd.stochastic_lattice(10000, 100.0, true);
-      fd.repel_lattice(100,100,true);
-    }
+    // for (size_t i = 0; i < 10; ++i)
+    // {
+    //   Point base_point = find_neg(H);
+    //   StochFunDom sfd(base_point, H);
+    //   sfd.addPoints(new_Words);
+    //   sfd.stochastic_lattice(1000, 100.0, true);
+    //   sfd.repel_lattice(100,100,true);
+    // }
+
+    FunDom fd(new_Words, H);
+    const std::vector<Word> fd_words = fd.get_vertices(true);
   }
 
   if (mode == RunMode::verbose)
@@ -299,8 +305,6 @@ int main(int argc, char *argv[])
     bool para = false;
     size_t index = 65;
 
-//,8,30,9,30,23,30,
-// (0, 1/10, 5/10) (3/10, 4/10, 8/10)
     const Triple ATriple(0,10, 1,10, 5,10);
     const CompMat3 A = TripleToMatrix(ATriple);
 

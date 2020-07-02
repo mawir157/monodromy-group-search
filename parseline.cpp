@@ -208,11 +208,13 @@ std::tuple<comp_d, comp_d, comp_d> parseMatrixRow(const std::string row)
   return three;
 }
 
-CompMat3 parseMatrix(std::ifstream& dataStream)
+CompMat3 parseMatrix(std::ifstream& dataStream, std::string& name)
 {
   std::string line;
   getline(dataStream, line);
   // line should be of the form STRING = \n
+  const int equals = line.find_first_of (" =", 0);
+  name = line.substr(0, equals);
   // we don't do anything with this line
 
   getline(dataStream, line);
@@ -262,15 +264,22 @@ std::tuple<CompMat3, std::vector<CompMat3>>  parseMatrixFile(const std::string f
                                                              const bool verbose)
 {
   std::ifstream data_file(filename);
+  std::string name = "";
 
-  const CompMat3 H = parseMatrix(data_file);
+  const CompMat3 H = parseMatrix(data_file, name);
 
   std::vector<CompMat3> gens;
 
   std::string line; // not used
   while (getline(data_file, line))
   {
-    CompMat3 temp = parseMatrix(data_file);
+    CompMat3 temp = parseMatrix(data_file, name);
+    // check that these matrices are isometries wrt the Hermitian form
+    const CompMat3 iso_check = temp.t() * H * temp;
+
+    if (!arma::approx_equal(H, iso_check, "absdiff", TOL))
+      std::cout << "Warning: Matrix " << name << " is a not an isometry." << std::endl;
+
     gens.push_back(temp);
   }
 

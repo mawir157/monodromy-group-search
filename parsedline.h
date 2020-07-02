@@ -45,7 +45,7 @@ comp_d parseComplex(const std::string cString);
 
 std::tuple<comp_d, comp_d, comp_d> parseMatrixRow(const std::string row);
 
-CompMat3 parseMatrix(std::ifstream& dataStream);
+CompMat3 parseMatrix(std::ifstream& dataStream, std::string& name);
 
 std::tuple<CompMat3, std::vector<CompMat3>>  parseMatrixFile(const std::string filename,
 	                                                           const bool verbose = false);

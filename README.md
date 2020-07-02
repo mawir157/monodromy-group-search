@@ -31,3 +31,5 @@ sudo make install
 `mono -f input/groups.txt`
 
 `mono -l 5 5`
+
+`mono -m input/matrices.txt`

@@ -26,6 +26,10 @@ enum IsomClass { Identity,
 enum Generator { ID, A, Ai, B, Bi, R1, R2, R3, E1, E2, E3 };
 Generator inverse(const Generator gen);
 
+comp_d RoundComplex(const comp_d z, const double tol=TOL);
+void RemoveNearZeros(CompMat3& M, const double tol=TOL);
+void RemoveNearIntegers(CompMat3& M, const double tol=TOL);
+
 CompMat3 TripleToMatrix(const Triple A, const bool norm=true);
 CompMat3 SextupleToH(const Triple A, const Triple B, const bool force = true);
 CompMat3 GetU(const Triple A);
@@ -56,6 +60,3 @@ Point getEllipticFixedPoint(const CompMat3& M, const CompMat3& H);
 Point getLineReflectionPolar(const CompMat3& M, const CompMat3& H);
 void getLoxodromicFixed(const CompMat3& M, const CompMat3& H,
                         Point& p1, Point& p2);
-
-void RemoveNearZeros(CompMat3& M, const double tol=TOL);
-void RemoveNearIntegers(CompMat3& M, const double tol=TOL);

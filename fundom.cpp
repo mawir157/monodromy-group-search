@@ -2,18 +2,18 @@
 #include "fundom.h"
 #include "matrixfns.h"
 
-FunDom::FunDom(const Point& p, const CompMat3& H) :
+StochFunDom::StochFunDom(const Point& p, const CompMat3& H) :
     m_base(p)
   , m_H(H) {}
 
 
-void FunDom::addPoints(const std::vector<Word>& wds)
+void StochFunDom::addPoints(const std::vector<Word>& wds)
 {
   for (size_t i = 0; i <  wds.size(); ++i)
     this->addPoint(wds[i].get_matrix());
 }
 
-void FunDom::addPoint(const CompMat3& M)
+void StochFunDom::addPoint(const CompMat3& M)
 {
   Point image = M * m_base;
   if (arma::norm(image - m_base) < TOL)
@@ -27,7 +27,7 @@ void FunDom::addPoint(const CompMat3& M)
   m_images.push_back(image);
 }
 
-void FunDom::print() const
+void StochFunDom::print() const
 {
   for (size_t i = 0; i < m_images.size(); ++i)
   {
@@ -45,7 +45,7 @@ void FunDom::print() const
   }
 }
 
-unsigned int FunDom::stochastic_lattice(const unsigned int n,
+unsigned int StochFunDom::stochastic_lattice(const unsigned int n,
                                         const double width,
                                         const bool verbose) const
 {
@@ -94,9 +94,9 @@ unsigned int FunDom::stochastic_lattice(const unsigned int n,
   return inside_distances.size();
 }
 
-std::vector<double> FunDom::repel_lattice(const unsigned int n,
+std::vector<double> StochFunDom::repel_lattice(const unsigned int n,
                                           const unsigned int steps,
-                                          const bool verbose)
+                                          const bool verbose) const
 {
   std::vector<double> distances;
 
@@ -106,7 +106,6 @@ std::vector<double> FunDom::repel_lattice(const unsigned int n,
     while (!is_in_Dirichlet(p))
       p = find_neg(m_H);
     
-    std::cout << i << std::endl;
     for (size_t j = 0; j < steps; ++j)
     {
       move_point(p, verbose);
@@ -123,18 +122,19 @@ std::vector<double> FunDom::repel_lattice(const unsigned int n,
   return distances;
 }
 
-void FunDom::move_point(Point& p, const bool verbose)
+void StochFunDom::move_point(Point& p, const bool verbose) const
 {
   std::uniform_real_distribution<double> unif(-0.1, 0.1);
   std::random_device rd;
   std::mt19937 gen(rd());
 
   const double dist = comp_distance(p, m_base, m_H);
-if (verbose) {std::cout << "]--> " << dist << std::endl;}
+// if (verbose) {std::cout << "]--> " << dist << std::endl;}
 
   // while (true)
-  for (size_t i = 0; i < 50; ++i)
+  for (size_t i = 0; i < 500; ++i)
   {
+// std::cout << i << std::endl;
     Point new_p(3);
     new_p << p[0] + comp_d(unif(gen), unif(gen)) << arma::endr
           << p[1] + comp_d(unif(gen), unif(gen)) << arma::endr
@@ -149,13 +149,13 @@ if (verbose) {std::cout << "]--> " << dist << std::endl;}
     if(!is_in_Dirichlet(new_p))
       continue;
 
-if (verbose) {std::cout << "|---------------->" << new_dist << std::endl;}
+// if (verbose) {std::cout << "|---------------->" << new_dist << std::endl;}
     p = new_p;
     break;
   }
 }
 
-bool FunDom::is_in_Dirichlet(const Point& p) const
+bool StochFunDom::is_in_Dirichlet(const Point& p) const
 {
   bool ok = true;
   const double d = comp_distance(m_base, p, m_H);
@@ -192,4 +192,80 @@ std::vector<double> get_spectrum(const Point& p,
   }
 
   return reduced_deistances;
+}
+
+std::vector<Point> get_orbit(const Point& p,
+                             const std::vector<Word>& words)
+{
+  std::vector<Point> seen_points;
+  for (size_t i = 0; i < words.size(); ++i)
+  {
+    const Point q = normalize(words[i].get_matrix() * p,2);
+
+    bool ok = true;
+    for (size_t j = 0; j < seen_points.size(); ++j)
+    if (arma::approx_equal(q, seen_points[j], "absdiff", TOL))
+    {
+      ok = false;
+      break;
+    }
+
+    if (ok)
+      seen_points.push_back(q);
+  }
+
+  return seen_points;
+}
+
+FunDom::FunDom(const std::vector<Word>& words, const CompMat3& H) :
+    m_words(words)
+  , m_H(H) {}
+
+std::vector<Word> FunDom::get_vertices(const bool verbose) const
+{
+  std::vector<Point> fixed_points;
+  std::vector<Word> rel_words;
+  fixed_points.reserve(m_words.size());
+
+  for (size_t i = 0; i < m_words.size(); ++i)
+  {
+    const Word w = m_words[i];
+    if ((w.get_isom_class() != Elliptic) && 
+        (w.get_isom_class() != ReflectionPoint))
+      continue;
+
+    const CompMat3 m = w.get_matrix();
+    const Point p = getEllipticFixedPoint(m, m_H);
+
+
+    bool ok = true;
+    for (size_t j = 0; j < fixed_points.size(); ++j)
+    {
+      const Point q = fixed_points[j];
+      if (arma::approx_equal(q, p, "absdiff", TOL))
+      {
+        ok = false;
+        break;
+      }
+    }
+
+    if (ok)
+    {
+      // fixed_points.push_back(p);
+      const std::vector<Point> orbit = get_orbit(p, m_words);
+      fixed_points.insert(fixed_points.end(), orbit.begin(), orbit.end());
+      rel_words.push_back(w);
+      if (verbose)
+      {
+        std::cout << "New vertex - " << w.as_string() 
+                  // << " | " << w.str_isom_class() << " | "
+                  // << goldman(RoundComplex(arma::trace(m))) 
+                  // << " | " << RoundComplex(arma::trace(m))
+                  // << " | " << (arma::trace(m))
+                  << std::endl;
+      }
+    }
+  }
+
+  return rel_words;
 }
