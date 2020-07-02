@@ -1,3 +1,4 @@
+
 # monodromy-group-search
 
 Program for exploring the properties of complex hyperbolic triangle groups this is an improved and
@@ -33,3 +34,6 @@ sudo make install
 `mono -l 5 5`
 
 `mono -m input/matrices.txt`
+
+### Mode -m
+This mode allows the user to input their own matrices in a file (see ./input/matrices.txt for an example). The code uses a tolerance of between 1e-6 and 1e-10 to check when two complex numbers are equal. Consequently the values in the text file should be given to around 15 decimal places otherwise rounding errors start to creep in and code fails in unpredictable ways where is difficult to tell if something is real or an artefact of rounding.

@@ -148,7 +148,7 @@ CompMat3 power(const CompMat3 A, const size_t p)
   {
     m = m * A;
     RemoveNearZeros(m);
-    //RemoveNearIntegers(m);
+    // RemoveNearIntegers(m);
   }
 
   return m;
@@ -162,7 +162,7 @@ int base_order(const CompMat3& m, const int max_order)
   {
     m_copy = m_copy * m;
     RemoveNearZeros(m_copy);
-    //RemoveNearIntegers(m_copy);
+    // RemoveNearIntegers(m_copy);
 
     if (isId(m_copy, HIGHER_TOL))
       return i;

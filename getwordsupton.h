@@ -9,3 +9,4 @@ bool get_words_upto_n(const unsigned int n,
 	                    const bool get_all = true);
 
 double summary(const std::vector<Word>& Words);
+void debugGroup(const std::vector<Word>& Words);

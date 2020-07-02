@@ -283,6 +283,8 @@ int main(int argc, char *argv[])
     std::cout << (good ? "DISCRETE!" : "NON-DISCRETE!") << std::endl;
     summary(new_Words);
 
+    debugGroup(new_Words);
+
     GroupDescription gd(p_H);
     gd.find_alt(new_Words, 2);
     std::cout << gd.print() << std::endl;

@@ -150,3 +150,25 @@ double summary(const std::vector<Word>& Words)
 
   return (1.0 * LX_count) / (1.0 * Words.size());
 }
+
+void debugGroup(const std::vector<Word>& Words)
+{
+  for (size_t i = 0; i < Words.size(); ++i)
+  {
+    const Word w = Words[i];
+    if (w.get_isom_class() != IsomClass::Elliptic)
+      continue;
+
+    if (w.get_order() > 0)
+      continue;
+
+    std::cout << w.as_string() << std::endl;
+    arma::cx_vec eigval;
+    arma::cx_mat eigvec;
+
+    arma::eig_gen(eigval, eigvec, w.get_matrix());
+    std::cout << std::arg(eigval[0])/ PI << " | "
+              << std::arg(eigval[1])/ PI << " | "
+              << std::arg(eigval[2])/ PI <<  std::endl;
+  }
+}
