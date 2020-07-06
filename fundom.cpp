@@ -1,6 +1,4 @@
-#include "includes.h"
 #include "fundom.h"
-#include "matrixfns.h"
 
 StochFunDom::StochFunDom(const Point& p, const CompMat3& H) :
     m_base(p)

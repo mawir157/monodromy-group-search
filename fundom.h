@@ -1,5 +1,6 @@
 #pragma once
 
+#include "includes.h"
 #include "word.h"
 
 class StochFunDom

@@ -1,5 +1,7 @@
 #pragma once
+
 #include "includes.h"
+#include "matrixfns.h"
 
 Polar normalize(const Point& p1, size_t index = 0);
 Polar get_polar(const Point& p1, const Point& p2, const CompMat3& H);

@@ -1,5 +1,4 @@
 #include "geometry.h"
-#include "matrixfns.h"
 
 Polar normalize(const Point& p, size_t index)
 {

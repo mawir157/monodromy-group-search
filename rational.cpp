@@ -1,5 +1,3 @@
-#include "includes.h"
-#include "utils.h"
 #include "rational.h"
 
 Rational::Rational(int m, unsigned int n) :
