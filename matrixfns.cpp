@@ -1,7 +1,4 @@
-#include "includes.h"
-#include "rational.h"
 #include "matrixfns.h"
-#include "geometry.h"
 
 Generator inverse(const Generator gen)
 {

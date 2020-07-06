@@ -1,4 +1,5 @@
 #pragma once
+
 #include "includes.h"
 #include "rational.h"
 #include "geometry.h"
